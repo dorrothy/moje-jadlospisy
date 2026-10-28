@@ -44,7 +44,7 @@ export function weeksOfRecipe(id: string) {
   return weeks.filter((w) => w.days.some((d) => Object.values(d).includes(id))).map((w) => w.n);
 }
 
-export function searchRecipes(q: string, opts: { week?: number; type?: MealType; favs?: string[] } = {}) {
+export function searchRecipes(q: string, opts: { week?: number | undefined; type?: MealType | undefined; favs?: string[] | undefined } = {}) {
   const nq = normalize(q);
   return recipes.filter((r) => {
     if (opts.type && r.type !== opts.type) return false;
@@ -66,6 +66,7 @@ export function shoppingList(weekN: number, servings: number): ShoppingRow[] {
   for (const day of week.days) {
     for (const rid of Object.values(day)) {
       const rec = recipeById[rid];
+      if (!rec) continue;
       for (const [id, g] of rec.ingredients) {
         const row = map.get(id) ?? { id, name: ingredients[id].name, aisle: ingredients[id].aisle, grams: 0, recipes: [] };
         row.grams += g * servings;

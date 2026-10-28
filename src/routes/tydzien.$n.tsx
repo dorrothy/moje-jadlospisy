@@ -29,7 +29,7 @@ export const Route = createFileRoute("/tydzien/$n")({
 function WeekPage() {
   const { week } = Route.useLoaderData();
   const { dzien = 0 } = Route.useSearch();
-  const day = week.days[dzien];
+  const day = week.days[dzien] ?? week.days[0]!;
   const total = mealSlots.reduce(
     (acc, s) => {
       const m = computeMacros(recipeById[day[s.type]].ingredients);
