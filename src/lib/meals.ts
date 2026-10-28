@@ -28,6 +28,12 @@ export function itemMacros([id, g]: Item) {
   return { kcal: Math.round((ing.kcal * g) / 100), p: r1(((ing.p ?? 0) * g) / 100), f: r1(((ing.f ?? 0) * g) / 100), c: r1(((ing.c ?? 0) * g) / 100) };
 }
 
+/** Full partner quantities replace the base; legacy extras remain additive. */
+export function recipeItems(recipe: Recipe, forHim = false): Item[] {
+  if (!forHim || !recipe.partner) return recipe.ingredients;
+  return recipe.partner.ingredients ?? [...recipe.ingredients, ...recipe.partner.extra];
+}
+
 /** Normalizacja do wyszukiwania bez polskich znaków. */
 export function normalize(s: string) {
   return s.toLowerCase().replace(/ł/g, "l").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();

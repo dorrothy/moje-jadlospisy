@@ -2,6 +2,8 @@
 // z ogólnodostępnych tabel żywieniowych). Popraw je wg etykiet produktów, które kupujesz.
 // Pole ustawione na null = brak danych → w aplikacji pokaże się "do uzupełnienia".
 
+import { newNutrition } from './nutrition-new';
+
 export type Ingredient = {
   name: string;
   /** dział w liście zakupów */
@@ -13,6 +15,7 @@ export type Ingredient = {
 };
 
 export const ingredients = {
+  ...newNutrition,
   // Mięso i ryby
   piers_kurczaka: { name: "Pierś z kurczaka", aisle: "Mięso i ryby", kcal: 110, p: 23, f: 1.5, c: 0 },
   udka_kurczaka: { name: "Udka z kurczaka (bez kości)", aisle: "Mięso i ryby", kcal: 180, p: 18, f: 12, c: 0 },

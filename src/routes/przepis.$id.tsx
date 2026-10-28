@@ -8,7 +8,7 @@ import { copyOriginal, type CustomRecipe } from "@/lib/custom-data";
 import { useState } from "react";
 import { recipeById } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
-import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatGrams } from "@/lib/meals";
+import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatGrams, recipeItems } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 
 export const Route = createFileRoute("/przepis/$id")({
@@ -53,7 +53,7 @@ function OriginalRecipePage() {
   const [forHim, setForHim] = useState(false);
   if (!recipe) return null;
   const m = computeMacros(recipe.ingredients);
-  const partnerM = recipe.partner ? computeMacros([...recipe.ingredients, ...recipe.partner.extra]) : null;
+  const partnerM = recipe.partner ? computeMacros(recipeItems(recipe, true)) : null;
   const shown = forHim && partnerM ? partnerM : m;
   const fav = isFav(recipe.id);
 
@@ -92,6 +92,7 @@ function OriginalRecipePage() {
         <p className="mt-3 text-[11px] text-muted-foreground">
           Wartości szacunkowe na 1 porcję{forHim ? " (wersja dla chłopaka)" : ""}, wyliczone z tabeli składników.
         </p>
+        {recipe.rawWeights && <p className="mt-2 text-xs text-muted-foreground">Masy przed obróbką: jajka bez skorupki, owoce i warzywa bez niejadalnych części, konserwy odsączone. Ryż i makaron ważone na sucho. Drobne przyprawy bez gramatur nie są wliczone.</p>}
         {shown.missing.length > 0 && (
           <p className="mt-2 rounded-xl bg-warning px-3 py-2 text-xs text-warning-foreground">
             Do uzupełnienia: {shown.missing.join(", ")} — brak wartości, nie wliczone do sumy.
@@ -100,9 +101,9 @@ function OriginalRecipePage() {
       </header>
 
       {recipe.partner && (
-        <button
+        <Button variant="ghost" aria-pressed={forHim}
           onClick={() => setForHim((v) => !v)}
-          className={`mt-4 flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors ${forHim ? "border-primary bg-secondary" : "bg-card"}`}
+          className={`mt-4 flex h-auto w-full items-center gap-3 whitespace-normal rounded-2xl border p-4 text-left transition-colors ${forHim ? "border-primary bg-secondary" : "bg-card"}`}
         >
           <Users className="h-5 w-5 shrink-0 text-primary" />
           <span className="flex-1 text-sm">
@@ -112,7 +113,7 @@ function OriginalRecipePage() {
           <span className={`h-6 w-10 rounded-full p-0.5 transition-colors ${forHim ? "bg-primary" : "bg-muted"}`}>
             <span className={`block h-5 w-5 rounded-full bg-card transition-transform ${forHim ? "translate-x-4" : ""}`} />
           </span>
-        </button>
+        </Button>
       )}
 
       <section className="mt-6">
@@ -130,8 +131,8 @@ function OriginalRecipePage() {
               <tr><th className="px-3 py-2 text-left font-medium">Składnik</th><th className="px-2 py-2 text-right font-medium">Ilość</th><th className="px-3 py-2 text-right font-medium">kcal / B</th></tr>
             </thead>
             <tbody>
-              {[...recipe.ingredients, ...(forHim && recipe.partner ? recipe.partner.extra.map((e) => [e[0], e[1], "dla niego"] as typeof e) : [])].map((it, i) => {
-                const im = itemMacros(it);
+              {recipeItems(recipe, forHim).map((it, i) => {
+                const im = itemMacros([it[0], it[1] * servings]);
                 return (
                   <tr key={i} className="border-t">
                     <td className="px-3 py-2.5">
@@ -149,6 +150,7 @@ function OriginalRecipePage() {
           </table>
         </div>
         {recipe.spices && <p className="mt-2 text-sm text-muted-foreground"><strong>Przyprawy:</strong> {recipe.spices}</p>}
+        {recipe.rawWeights && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer font-medium">Tabela wartości szacunkowych na 100 g</summary><p className="mt-2">Węglowodany przyswajalne, bez błonnika. Uśrednione dane tabelaryczne i typowe etykiety; marka i tłustość produktu zmieniają wynik. Energia z tabeli może różnić się od 4B + 9T + 4W.</p><ul className="mt-2 space-y-2">{recipeItems(recipe,forHim).map(([id]) => {const ing=ingredients[id];return <li key={id}>{ing.name}: {ing.kcal} kcal · B {ing.p} g · T {ing.f} g · W {ing.c} g</li>;})}</ul><p className="mt-2">Podstawa: <a className="underline" href="https://fdc.nal.usda.gov/" target="_blank" rel="noreferrer">USDA FoodData Central</a>, typowe europejskie etykiety produktów. To nie analiza laboratoryjna dania.</p></details>}
       </section>
 
       <section className="mt-6">

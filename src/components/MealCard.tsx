@@ -22,6 +22,7 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
           <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{recipe.minutes} min</span>
           <span>~{m.kcal} kcal{m.missing.length ? "*" : ""}</span>
           <span>B {m.p} g</span>
+          {recipe.rawWeights && <span>makro szacunkowe</span>}
           {recipe.partner && <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">+ wersja dla niego</span>}
         </div>
       </Link>

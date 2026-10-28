@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { recipes, mealSlots, type MealType } from '@/data/recipes';
 import { ingredients } from '@/data/ingredients';
-import { computeMacros, normalize } from '@/lib/meals';
+import { computeMacros, normalize, recipeItems } from '@/lib/meals';
 
 export const macroSchema = z.object({ kcal: z.number().finite().nonnegative(), p: z.number().finite().nonnegative(), f: z.number().finite().nonnegative(), c: z.number().finite().nonnegative() });
 export const ingredientSchema = z.object({ name: z.string().trim().min(1), amount: z.number().finite().positive(), unit: z.enum(['g', 'kg', 'ml', 'l', 'szt.', 'łyżka', 'łyżeczka']) });
@@ -34,7 +34,9 @@ export function copyOriginal(id: string): CustomRecipe | undefined {
   const r=recipes.find(r=>r.id===id); if(!r) return;
   const convert = (items: typeof r.ingredients): CustomIngredient[] => items.map(([id,amount]) => ({name:ingredients[id].name,amount,unit:'g'}));
   const m=computeMacros(r.ingredients);
-  return { id:newId('own'),name:`${r.name} — kopia`,category:r.category,type:r.type,minutes:r.minutes,servings:1,ingredients:convert(r.ingredients),steps:[...r.steps],macros:{kcal:m.kcal,p:m.p,f:m.f,c:m.c},partner:r.partner ? {note:r.partner.note,extra:convert(r.partner.extra)} : undefined };
+  const extra = r.partner?.ingredients ? r.partner.ingredients.map(([id,g]) => [id,g - (r.ingredients.find(([base])=>base===id)?.[1] ?? 0)] as typeof r.ingredients[number]).filter(([,g])=>g>0) : r.partner?.extra ?? [];
+  const pm = r.partner ? computeMacros(recipeItems(r,true)) : undefined;
+  return { id:newId('own'),name:`${r.name} — kopia`,category:r.category,type:r.type,minutes:r.minutes,servings:1,ingredients:convert(r.ingredients),steps:[...r.steps],macros:{kcal:m.kcal,p:m.p,f:m.f,c:m.c},partner:r.partner ? {note:r.partner.note,extra:convert(extra),macros:pm ? {kcal:pm.kcal,p:pm.p,f:pm.f,c:pm.c} : undefined} : undefined };
 }
 export type ShopItem = { id:string; name:string; amount:number; unit:string };
 export function customShopping(w: CustomWeek, custom: CustomRecipe[], portions=1): ShopItem[] {
