@@ -9,7 +9,10 @@ export const ingredientSchema = z.object({ name: z.string().trim().min(1), amoun
 export const customRecipeSchema = z.object({ id: z.string().startsWith('own-'), name: z.string().trim().min(1), category: z.string().trim().min(1), collection: z.string().optional(), equipment: z.array(z.enum(['air-fryer','oven','grill','waffle','stovetop'])).optional(), type: z.enum(['sniadanie','obiad','deser','kolacja']), minutes: z.number().finite().int().positive(), servings: z.number().finite().int().positive(), ingredients: z.array(ingredientSchema).min(1), steps: z.array(z.string().trim().min(1)).min(1), macros: macroSchema, partner: z.object({ note: z.string().trim().min(1), extra: z.array(ingredientSchema), macros: macroSchema.optional() }).optional() });
 const daySchema = z.object({ sniadanie: z.string().nullable(), obiad: z.string().nullable(), deser: z.string().nullable(), kolacja: z.string().nullable() });
 export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7) });
-export const dataSchema = z.object({ version: z.literal(1), recipes: z.array(customRecipeSchema), weeks: z.array(customWeekSchema) }).superRefine((data, ctx) => {
+export const reviewSchema = z.object({ rating:z.number().int().min(1).max(5).optional(), note:z.string(), cooked:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{const d=new Date(v);return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;}).or(z.literal('')) });
+export const pantrySchema = z.object({name:z.string().trim().min(1),amount:z.number().finite().positive().optional(),unit:ingredientSchema.shape.unit});
+export const extraShopSchema = ingredientSchema.extend({checked:z.boolean().optional()});
+export const dataSchema = z.object({ version: z.literal(1), recipes: z.array(customRecipeSchema), weeks: z.array(customWeekSchema), reviews:z.record(reviewSchema).optional(), pantry:z.array(pantrySchema).optional(), extraShopping:z.array(extraShopSchema).optional() }).superRefine((data, ctx) => {
   for (const key of ['recipes', 'weeks'] as const) if (new Set(data[key].map(x => x.id)).size !== data[key].length) ctx.addIssue({code:'custom', message:'Powtarzające się identyfikatory'});
   const ids = new Set([...recipes.map(r => r.id), ...data.recipes.map(r => r.id)]);
   for (const w of data.weeks) for (const d of w.days) for (const id of Object.values(d)) if (id && !ids.has(id)) ctx.addIssue({ code:'custom', message:'Tydzień wskazuje nieistniejący przepis' });
@@ -21,14 +24,15 @@ export type LocalData = z.infer<typeof dataSchema>;
 export const emptyData: LocalData = { version: 1, recipes: [], weeks: [] };
 export const newId = (kind: 'own' | 'week') => `${kind}-${crypto.randomUUID()}`;
 export function blankWeek(name: string): CustomWeek { return { id:newId('week'), name, days:Array.from({length:7}, () => ({sniadanie:null,obiad:null,deser:null,kolacja:null})) }; }
-export function deleteRecipe(data: LocalData, id: string): LocalData { return {...data, recipes:data.recipes.filter(r => r.id !== id), weeks:data.weeks.map(w => ({...w,days:w.days.map(d => Object.fromEntries(Object.entries(d).map(([slot,rid]) => [slot, rid === id ? null : rid])) as CustomWeek['days'][number])}))}; }
+export function deleteRecipe(data: LocalData, id: string): LocalData { const reviews={...data.reviews};delete reviews[id];return {...data,...(data.reviews?{reviews}:{}), recipes:data.recipes.filter(r => r.id !== id), weeks:data.weeks.map(w => ({...w,days:w.days.map(d => Object.fromEntries(Object.entries(d).map(([slot,rid]) => [slot, rid === id ? null : rid])) as CustomWeek['days'][number])}))}; }
 export function parseImport(text: string): LocalData { return dataSchema.parse(JSON.parse(text)); }
 export function mergeImport(current: LocalData, incoming: LocalData): LocalData {
   // Import is additive: remap colliding IDs, including every week assignment.
   const ids = new Set(current.recipes.map(r=>r.id)); const remap = new Map<string,string>();
   const added = incoming.recipes.map(r => { const id=ids.has(r.id)?newId('own'):r.id; ids.add(id); remap.set(r.id,id); return {...r,id}; });
   const weekIds = new Set(current.weeks.map(w=>w.id));
-  return {...current, recipes:[...current.recipes,...added], weeks:[...current.weeks,...incoming.weeks.map(w=>{ const id=weekIds.has(w.id)?newId('week'):w.id; weekIds.add(id); return {...w,id,days:w.days.map(d=>Object.fromEntries(Object.entries(d).map(([s,r])=>[s,r ? remap.get(r) ?? r : null])) as CustomWeek['days'][number])}; })]};
+  const reviews={...current.reviews};for(const [rid,review] of Object.entries(incoming.reviews??{})){const id=remap.get(rid)??rid;const old=reviews[id];reviews[id]=old?{...old,note:old.note===review.note?old.note:[old.note,review.note&&`Import: ${review.note}`].filter(Boolean).join('\n'),cooked:old.cooked||review.cooked,...(!old.rating&&review.rating?{rating:review.rating}:{})}:review;}
+  return {...current,...(current.reviews||incoming.reviews?{reviews}:{}),...(incoming.pantry?{pantry:[...(current.pantry??[]),...incoming.pantry]}:{}),...(incoming.extraShopping?{extraShopping:[...(current.extraShopping??[]),...incoming.extraShopping]}:{}), recipes:[...current.recipes,...added], weeks:[...current.weeks,...incoming.weeks.map(w=>{ const id=weekIds.has(w.id)?newId('week'):w.id; weekIds.add(id); return {...w,id,days:w.days.map(d=>Object.fromEntries(Object.entries(d).map(([s,r])=>[s,r ? remap.get(r) ?? r : null])) as CustomWeek['days'][number])}; })]};
 }
 export function matchesCustom(r: CustomRecipe, q: string) { const hay=normalize([r.name,r.category,r.collection ?? '',r.partner?.note ?? '',...r.ingredients.map(i=>i.name)].join(' ')); return normalize(q).split(/\s+/).every(t=>hay.includes(t)); }
 export function copyOriginal(id: string): CustomRecipe | undefined {
