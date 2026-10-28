@@ -100,7 +100,7 @@ function OriginalRecipePage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground">
-          Wartości szacunkowe: {forHim ? '1 większa porcja chłopaka' : `${servings.toLocaleString('pl')} × porcja bazowa`}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
+          Wartości szacunkowe: {forHim ? '1 większa porcja chłopaka' : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja bazowa'}`}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
         </p>
         {recipe.rawWeights && <p className="mt-2 text-xs text-muted-foreground">Masy przed obróbką: jajka bez skorupki, owoce i warzywa bez niejadalnych części, konserwy odsączone. Ryż i makaron ważone na sucho. Drobne przyprawy bez gramatur nie są wliczone.</p>}
         {shown.missing.length > 0 && (
@@ -135,7 +135,7 @@ function OriginalRecipePage() {
           <h2 className="text-xl font-bold">Składniki</h2>
           <div className="flex items-center gap-2 rounded-full bg-card p-1 shadow-soft">
             <Button size="icon" variant="ghost" disabled={forHim} aria-label="Mniej porcji" onClick={() => setServings((s) => Math.max(.75, s - .25))}><Minus className="h-4 w-4" /></Button>
-            <span className="min-w-16 text-center text-sm font-medium">{forHim ? '1 większa porcja' : `${servings.toLocaleString('pl')} × porcja`}</span>
+            <span className="min-w-16 text-center text-sm font-medium">{forHim ? '1 większa porcja' : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja'}`}</span>
             <Button size="icon" variant="ghost" disabled={forHim} aria-label="Więcej porcji" onClick={() => setServings((s) => Math.min(20, s + .25))}><Plus className="h-4 w-4" /></Button>
           </div>
         </div>
