@@ -37,12 +37,13 @@ export function recipeItems(recipe: Recipe, forHim = false, protein = false): It
 
 /** Razem dla 2 osób: Twoja porcja (× `servings`) i jego większa porcja, zsumowane po składnikach. */
 export function combinedItems(recipe: Recipe, protein = false, servings = 1): Item[] {
-  const mine = recipeItems(recipe, false, protein).map(([id, g, note]) => [id, g * servings, note] as Item);
-  if (!recipe.partner) return mine;
+  const row = (id: IngredientId, g: number, note?: string): Item => (note === undefined ? [id, g] : [id, g, note]);
   const map = new Map<IngredientId, Item>();
-  for (const [id, g, note] of [...mine, ...recipeItems(recipe, true, protein)]) {
+  for (const [id, g, note] of recipeItems(recipe, false, protein)) map.set(id, row(id, g * servings, note));
+  if (recipe.partner) for (const [id, g, note] of recipeItems(recipe, true, protein)) {
     const prev = map.get(id);
-    map.set(id, prev ? [id, prev[1] + g, prev[2] ?? note] : [id, g, note]);
+    if (prev) prev[1] += g;
+    else map.set(id, row(id, g, note));
   }
   return [...map.values()];
 }

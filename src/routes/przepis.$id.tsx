@@ -206,7 +206,7 @@ function OriginalRecipePage() {
           name={recipe.name}
           steps={recipe.steps}
           ingredients={originalCookingItems(recipe, mode, protein, servings)}
-          note={recipe.spices ? `Przyprawy: ${recipe.spices}` : undefined}
+          {...(recipe.spices ? { note: `Przyprawy: ${recipe.spices}` } : {})}
           onClose={() => setCooking(false)}
         />
       )}
