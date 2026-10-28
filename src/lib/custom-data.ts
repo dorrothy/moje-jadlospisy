@@ -12,7 +12,8 @@ export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), n
 export const reviewSchema = z.object({ rating:z.number().int().min(1).max(5).optional(), note:z.string(), cooked:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{const d=new Date(v);return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;}).or(z.literal('')) });
 export const pantrySchema = z.object({name:z.string().trim().min(1),amount:z.number().finite().positive().optional(),unit:ingredientSchema.shape.unit});
 export const extraShopSchema = ingredientSchema.extend({checked:z.boolean().optional()});
-export const dataSchema = z.object({ version: z.literal(1), recipes: z.array(customRecipeSchema), weeks: z.array(customWeekSchema), reviews:z.record(reviewSchema).optional(), pantry:z.array(pantrySchema).optional(), extraShopping:z.array(extraShopSchema).optional() }).superRefine((data, ctx) => {
+export const heroSchema = z.object({ eyebrow:z.string().trim().min(1).max(80), title:z.string().trim().min(1).max(60), subtitle:z.string().trim().min(1).max(120) }).partial();
+export const dataSchema = z.object({ version: z.literal(1), recipes: z.array(customRecipeSchema), weeks: z.array(customWeekSchema), reviews:z.record(reviewSchema).optional(), pantry:z.array(pantrySchema).optional(), extraShopping:z.array(extraShopSchema).optional(), hero:heroSchema.optional() }).superRefine((data, ctx) => {
   for (const key of ['recipes', 'weeks'] as const) if (new Set(data[key].map(x => x.id)).size !== data[key].length) ctx.addIssue({code:'custom', message:'Powtarzające się identyfikatory'});
   const ids = new Set([...recipes.map(r => r.id), ...data.recipes.map(r => r.id)]);
   for (const w of data.weeks) for (const d of w.days) for (const id of Object.values(d)) if (id && !ids.has(id)) ctx.addIssue({ code:'custom', message:'Tydzień wskazuje nieistniejący przepis' });
