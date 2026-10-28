@@ -1,5 +1,5 @@
 import { describe,it,expect } from 'vitest';
-import { blankWeek,customShopping,deleteRecipe,parseImport,mergeImport,matchesCustom,emptyData,type CustomRecipe } from '@/lib/custom-data';
+import { blankWeek,customShopping,deleteRecipe,parseImport,mergeImport,matchesCustom,emptyData,weekBgClass,weekEmoji,type CustomRecipe } from '@/lib/custom-data';
 import { mealSlots } from '@/data/recipes';
 const r:CustomRecipe={id:'own-test',name:'Łosoś domowy',category:'Własne',type:'obiad',minutes:10,servings:2,ingredients:[{name:'Cukier',amount:200,unit:'g'},{name:'cukier',amount:0.1,unit:'kg'},{name:'Mleko',amount:100,unit:'ml'}],steps:['Gotuj'],macros:{kcal:123,p:12,f:3,c:4}};
 function at<T>(items:T[], index=0):T { const item=items[index]; if(item===undefined) throw new Error('Missing test item'); return item; }
@@ -13,4 +13,6 @@ describe('local recipes and weeks',()=>{
  it('imports additively and remaps conflicting assignments',()=>{const w=blankWeek('Test');at(w.days).obiad=r.id;const d={...emptyData,recipes:[r],weeks:[w]};const next=mergeImport(d,d);expect(next.recipes).toHaveLength(2);expect(next.weeks).toHaveLength(2);expect(at(next.recipes,1).id).not.toBe(r.id);expect(at(at(next.weeks,1).days).obiad).toBe(at(next.recipes,1).id);});
  it('rejects broken imports without changing existing data',()=>{expect(()=>parseImport('{bad')).toThrow();expect(()=>parseImport(JSON.stringify({...emptyData,recipes:[{...r,servings:0}]}))).toThrow();const w=blankWeek('x');at(w.days).obiad='missing';expect(()=>parseImport(JSON.stringify({...emptyData,weeks:[w]}))).toThrow();});
  it('searches own recipes without Polish accents',()=>{expect(matchesCustom(r,'losos')).toBe(true);expect(matchesCustom(r,'cukier')).toBe(true);expect(matchesCustom(r,'kurczak')).toBe(false);});
+ it('stores week emoji and color and rejects an unknown color',()=>{const w={...blankWeek('T'),emoji:'🥗',color:'week-5' as const};const parsed=parseImport(JSON.stringify({...emptyData,weeks:[w]}));expect(at(parsed.weeks).emoji).toBe('🥗');expect(at(parsed.weeks).color).toBe('week-5');expect(weekBgClass(at(parsed.weeks))).toBe('bg-week-5');expect(weekEmoji(at(parsed.weeks))).toBe('🥗');expect(()=>parseImport(JSON.stringify({...emptyData,weeks:[{...w,color:'week-9' as never}]}))).toThrow();});
+ it('gives weeks without emoji or color a stable default',()=>{const w=blankWeek('T');expect(weekEmoji(w)).toBe('🍽️');expect(weekBgClass(w)).toBe(weekBgClass(w));});
 });

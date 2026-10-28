@@ -20,7 +20,7 @@ export const Route = createFileRoute("/szukaj")({
     meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { title: "Szukaj przepisów — Moje przepisy" },
+      { title: "Szukaj przepisów — Let's cook" },
       { name: "description", content: "Szukaj przepisów po nazwie i składnikach, filtruj po tygodniu i typie posiłku." },
       { property: "og:title", content: "Szukaj przepisów" },
       { property: "og:description", content: "Wyszukiwarka po nazwie i składnikach." },
@@ -99,7 +99,7 @@ export function RecipeBrowser({ favOnly = false }: { favOnly?: boolean }) {
 function SearchPage() {
   return (
     <main className="px-4 pt-6">
-      <h1 className="text-3xl font-bold">Moje przepisy</h1>
+      <h1 className="text-3xl font-bold">Let's cook</h1>
       <RecipeBrowser />
     </main>
   );

@@ -8,11 +8,20 @@ export const macroSchema = z.object({ kcal: z.number().finite().nonnegative(), p
 export const ingredientSchema = z.object({ name: z.string().trim().min(1), amount: z.number().finite().positive(), unit: z.enum(['g', 'kg', 'ml', 'l', 'szt.', 'łyżka', 'łyżeczka']) });
 export const customRecipeSchema = z.object({ id: z.string().startsWith('own-'), name: z.string().trim().min(1), category: z.string().trim().min(1), collection: z.string().optional(), equipment: z.array(z.enum(['air-fryer','oven','grill','waffle','stovetop','no-cook','blender'])).optional(), type: z.enum(['sniadanie','obiad','deser','kolacja']), minutes: z.number().finite().int().positive(), servings: z.number().finite().int().positive(), ingredients: z.array(ingredientSchema).min(1), steps: z.array(z.string().trim().min(1)).min(1), macros: macroSchema, partner: z.object({ note: z.string().trim().min(1), extra: z.array(ingredientSchema), macros: macroSchema.optional() }).optional() });
 const daySchema = z.object({ sniadanie: z.string().nullable(), obiad: z.string().nullable(), deser: z.string().nullable(), kolacja: z.string().nullable() });
-export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7) });
+export const WEEK_COLORS = ['week-1','week-2','week-3','week-4','week-5','week-6'] as const;
+export type WeekColor = (typeof WEEK_COLORS)[number];
+export const WEEK_EMOJIS = ['🍳','🥗','🍲','🍝','🍜','🍱','🥑','🍎','🍰','🥘','🧇','🍣','🍕','🥐','🦐','🌮','🥟','🍦','🧁','🥩','🐟','🥦','🫕','🥪','🌶️','🫑','🥕','🍅'] as const;
+export const WEEK_COLOR_LABELS: Record<WeekColor,string> = {'week-1':'kremowy','week-2':'zielony','week-3':'brzoskwiniowy','week-4':'błękitny','week-5':'lawendowy','week-6':'morski'};
+const WEEK_BG: Record<WeekColor,string> = {'week-1':'bg-week-1','week-2':'bg-week-2','week-3':'bg-week-3','week-4':'bg-week-4','week-5':'bg-week-5','week-6':'bg-week-6'};
+export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7), emoji: z.string().trim().min(1).max(8).optional(), color: z.enum(WEEK_COLORS).optional() });
+export function weekColorClass(color:WeekColor):string{ return WEEK_BG[color]; }
+export function weekBgClass(w:{color?:WeekColor|undefined,id:string}):string{ const fallback=WEEK_COLORS[[...w.id].reduce((a,c)=>a+c.charCodeAt(0),0)%WEEK_COLORS.length]; return WEEK_BG[w.color ?? fallback ?? 'week-1']; }
+export function weekEmoji(w:{emoji?:string|undefined}):string{ return w.emoji ?? '🍽️'; }
 export const reviewSchema = z.object({ rating:z.number().int().min(1).max(5).optional(), note:z.string(), cooked:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{const d=new Date(v);return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;}).or(z.literal('')) });
 export const pantrySchema = z.object({name:z.string().trim().min(1),amount:z.number().finite().positive().optional(),unit:ingredientSchema.shape.unit});
 export const extraShopSchema = ingredientSchema.extend({checked:z.boolean().optional()});
-export const dataSchema = z.object({ version: z.literal(1), recipes: z.array(customRecipeSchema), weeks: z.array(customWeekSchema), reviews:z.record(reviewSchema).optional(), pantry:z.array(pantrySchema).optional(), extraShopping:z.array(extraShopSchema).optional() }).superRefine((data, ctx) => {
+export const heroSchema = z.object({ eyebrow:z.string().trim().min(1).max(80), title:z.string().trim().min(1).max(60), subtitle:z.string().trim().min(1).max(120) }).partial();
+export const dataSchema = z.object({ version: z.literal(1), recipes: z.array(customRecipeSchema), weeks: z.array(customWeekSchema), reviews:z.record(reviewSchema).optional(), pantry:z.array(pantrySchema).optional(), extraShopping:z.array(extraShopSchema).optional(), hero:heroSchema.optional() }).superRefine((data, ctx) => {
   for (const key of ['recipes', 'weeks'] as const) if (new Set(data[key].map(x => x.id)).size !== data[key].length) ctx.addIssue({code:'custom', message:'Powtarzające się identyfikatory'});
   const ids = new Set([...recipes.map(r => r.id), ...data.recipes.map(r => r.id)]);
   for (const w of data.weeks) for (const d of w.days) for (const id of Object.values(d)) if (id && !ids.has(id)) ctx.addIssue({ code:'custom', message:'Tydzień wskazuje nieistniejący przepis' });

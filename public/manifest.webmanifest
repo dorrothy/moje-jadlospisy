@@ -1,6 +1,6 @@
 {
-  "name": "Moje przepisy",
-  "short_name": "Moje przepisy",
+  "name": "Let's cook",
+  "short_name": "Let's cook",
   "description": "Własne przepisy, tygodnie posiłków i lista zakupów",
   "lang": "pl",
   "start_url": "./",
