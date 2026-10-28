@@ -1,4 +1,7 @@
 # Zadania
+- [ ] Lokalne zdjęcia Blob w IndexedDB: galeria, aparat, podgląd i zarządzanie
+- [ ] Kompresja, limity, obsługa błędów i kopia/import ze zdjęciami
+- [ ] Testy zdjęć, zachowania danych i przenoszenia między urządzeniami
 - [x] Lodówka: składniki, ostrożne dopasowanie ilości, brakujące zakupy
 - [x] Generator tygodnia: cele, preferencje, zamiany i zapis własnego tygodnia
 - [x] Oceny, notatki, data gotowania, filtry i eksport/import lokalnych danych
