@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog,DialogContent,DialogTitle,DialogDescription } from '@/components/ui/dialog';
 import { useLocalData } from '@/lib/local-data-context';
-import { matchesCustom, weekEmoji } from '@/lib/custom-data';
+import { matchesCustom, weekEmoji, type CustomWeek } from '@/lib/custom-data';
 import { searchRecipes, portionMacros, sumMacros } from '@/lib/meals';
 import { PlanNutrition } from '@/components/PlanNutrition';
 import { pageHead } from '@/lib/page-head';
