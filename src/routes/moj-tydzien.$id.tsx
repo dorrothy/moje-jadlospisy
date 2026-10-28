@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
-import { Plus, RefreshCw, Trash2, ShoppingBasket, Pencil } from 'lucide-react';
+import { Plus, RefreshCw, Trash2, ShoppingBasket, Pencil, Copy, Refrigerator } from 'lucide-react';
 import { recipes, dayNames, dayShort, mealSlots, type MealType } from '@/data/recipes';
 import { MealCard } from '@/components/MealCard';
 import { CustomRecipeCard } from '@/components/CustomRecipeCard';
