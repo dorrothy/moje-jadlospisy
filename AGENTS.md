@@ -16,3 +16,5 @@
 - Add recipe collections via the shared bundled recipe index and isolate new nutrition profiles so previous recipe values and week assignments remain unchanged.
 - Explicit partner ingredient lists replace the base portion; legacy extra ingredients remain additive, preventing double counting.
 - Equipment uses optional shared tags and read-time inference for legacy recipes; optional validated custom tags preserve old local exports without rewriting user data.
+- Fridge matching and week generation use a shared per-serving recipe adapter and pure local helpers; only compatible units and explicit synonyms match, with unknown quantities never treated as sufficient.
+- Extend the v1 local overlay with optional validated reviews, pantry and extra shopping fields so old backups remain byte-shape compatible; remap imported custom review keys and merge conflicts without replacing existing notes or ratings.

@@ -1,0 +1,3 @@
+import type { LocalData } from './custom-data';
+export function reviewMatches(id:string,reviews:LocalData['reviews'],minimum:number,tested:boolean){const r=reviews?.[id];return (!minimum||(r?.rating??0)>=minimum)&&(!tested||!!r?.cooked);}
+export function reviewSort(a:string,b:string,reviews:LocalData['reviews'],mode:string){if(mode==='rating')return (reviews?.[b]?.rating??0)-(reviews?.[a]?.rating??0);if(mode==='cooked')return (reviews?.[b]?.cooked??'').localeCompare(reviews?.[a]?.cooked??'');return 0;}

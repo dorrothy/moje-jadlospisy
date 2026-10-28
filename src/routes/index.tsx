@@ -33,6 +33,8 @@ function Index() {
         <Button asChild><Link to="/szukaj">Moje przepisy</Link></Button>
         <Button asChild variant="secondary"><Link to="/moje-tygodnie">Moje tygodnie</Link></Button>
         <Button asChild variant="outline"><Link to="/dane">Kopia danych</Link></Button>
+        <Button asChild variant="outline"><Link to="/lodowka">Co mam w lodówce?</Link></Button>
+        <Button asChild variant="outline"><Link to="/generator">Ułóż tydzień</Link></Button>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">Własne dane są lokalne, zapisane tylko na tym urządzeniu.</p>
       <h2 className="mt-6 text-xl">Oryginalne jadłospisy</h2>

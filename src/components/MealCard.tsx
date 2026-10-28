@@ -4,6 +4,7 @@ import type { Recipe } from "@/data/recipes";
 import { computeMacros } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
+import { RecipeReview, ReviewSummary } from './RecipeReview';
 
 export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: string; label?: string }) {
   const m = computeMacros(recipe.ingredients);
@@ -19,6 +20,7 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
       <Link to="/przepis/$id" params={{ id: recipe.id }} className="min-w-0 flex-1 after:absolute after:inset-0">
         {label && <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>}
         <h3 className="mt-0.5 text-base font-semibold leading-snug">{recipe.name}</h3>
+        <ReviewSummary id={recipe.id}/>
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{recipe.minutes} min</span>
           <span>~{m.kcal} kcal{m.missing.length ? "*" : ""}</span>
@@ -29,6 +31,7 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
           {recipe.partner && <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">+ wersja dla niego</span>}
         </div>
       </Link>
+      <RecipeReview id={recipe.id} compact/>
       <button
         aria-label={fav ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
         onClick={() => toggle(recipe.id)}
