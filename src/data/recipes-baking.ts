@@ -9,7 +9,8 @@ const dish = (
   equipment: Equipment[], ingredients: Item[], steps: string[], spices?: string,
   partnerChanges?: Item[], yieldInfo?: Recipe['yield'], proteinExtra?: Item[],
 ): Recipe => ({
-  id: `wypieki-${id}`, name, collection, category: collection, type, minutes, equipment, ingredients, steps, spices, rawWeights: true,
+  id: `wypieki-${id}`, name, collection, category: collection, type, minutes, equipment, ingredients, steps, rawWeights: true,
+  ...(spices ? { spices } : {}),
   ...(yieldInfo ? { yield: yieldInfo } : {}),
   ...(proteinExtra ? { proteinVariant: { note: 'Wariant wysokobiałkowy: dodaj odżywkę białkową; bez niej zwiększ skyr lub twaróg zgodnie ze wskazówką w krokach.', extra: proteinExtra } } : {}),
   ...(partnerChanges?.length ? { partner: { note: 'Oddzielna większa porcja: więcej ryby i dodatku węglowodanowego. Ryż i ziemniaki ugotuj według opakowania; rybę piecz do 63°C w środku.', extra: [], ingredients: [...ingredients.map(item => partnerChanges.find(([key]) => key === item[0]) ?? item), ...partnerChanges.filter(([key]) => !ingredients.some(([base]) => base === key))] } } : {}),

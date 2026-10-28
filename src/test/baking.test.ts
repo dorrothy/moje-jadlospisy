@@ -64,7 +64,7 @@ describe("28 nowych przepisów: ryby, owsianki, shake'i, ciasteczka, pieczywo", 
     const w = blankWeek('Pieczywo'); const d = w.days[0]!; d.sniadanie = chleb.id;
     const one = customShopping(w, []).find(r => r.name === 'Mąka orkiszowa')!.amount;
     expect(one).toBe(29); // 1 kromka, nie całe 400 g bochenka
-    d.portions = undefined; w.portions = [{ sniadanie: 2 }];
+    w.portions = [{ sniadanie: 2 }];
     expect(customShopping(w, []).find(r => r.name === 'Mąka orkiszowa')!.amount).toBe(58);
     const ciastka = byId('ciastka-owsiane');
     const w2 = blankWeek('Ciastka'); w2.days[0]!.deser = ciastka.id; w2.portions = [{ deser: 3 }];
