@@ -1,8 +1,9 @@
 # Zadania
-- [ ] Tryb gotowania: pełny ekran, odhaczanie kroków, wybudzony ekran
-- [ ] Meal prep: oznaczenie „resztka z wczoraj" (zakupy liczą raz) i kopiowanie dnia
-- [ ] Szukanie po kaloryczności (zakres kcal) w wyszukiwarce
-- [ ] Przeliczanie gramatury przepisu na wybraną kaloryczność (pół/podwójna/dowolna porcja)
+- [x] Tryb gotowania: pełny ekran, odhaczanie kroków, wybudzony ekran
+- [x] Meal prep: oznaczenie „resztka z wczoraj" (zakupy liczą raz) i kopiowanie dnia
+- [x] Szukanie po kaloryczności (zakres kcal) w wyszukiwarce
+- [x] Przeliczanie gramatury przepisu na wybraną kaloryczność (pół/podwójna/dowolna porcja)
+183 testy przechodzą. Chromium 390×844: filtr kcal 400–600 zawęził listę, przelicznik 300 kcal ustawił 0,75 porcji, tryb gotowania pokazał 5 kroków z odhaczaniem i informacją o wybudzonym ekranie, resztka pokazała wskaźnik i została pominięta w zakupach (test: 150 g zamiast 300 g), kopiowanie dnia przeniosło kolację na wtorek. Wake Lock na fizycznym iPhonie nie był testowany (Chromium testowe nie ma tego API — kod bezpiecznie pomija wskaźnik).
 - [x] 28 przepisów: Ryby 6, Owsianki 7, Shake'i 6, Ciasteczka 5, Pieczywo 4 (kolekcje wypieki-*, yield dla partii)
 - [x] Ciasteczka/pieczywo: gramatury za sztukę/kromkę, makro partii i 100 g liczone z składników, zakupy skalują się bez całego bochenka
 - [x] Wskazówki przechowywania dla ryb i pieczywa, wariant z odżywką dla shake'ów, porcje chłopaka dla ryb
