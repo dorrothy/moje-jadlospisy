@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Keep bundled recipes/weeks immutable; user data lives in a versioned, validated local overlay provided at the root, because the app must work without a backend.
+- Bundled and local weeks carry optional per-slot portion multipliers; compute macros from scaled ingredients, preserve multipliers in copies and JSON, and reset a replaced slot to one portion so meals, shopping and backups agree. Ready bundled plans are included as portable local copies on export without seeding localStorage.
 - Store custom ingredient quantities per whole recipe and manual macros per serving; normalize only compatible shopping units to avoid guessing density or piece weights.
 - Import local JSON additively and remap colliding IDs plus assignments so existing data is never overwritten.
 

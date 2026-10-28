@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Download, Upload, Images } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalData } from '@/lib/local-data';
-import { parseImport, mergeImport } from '@/lib/custom-data';
+import { parseImport, mergeImport, dataForBackup } from '@/lib/custom-data';
 import { makePhotoBackup, preparePhotoImport } from '@/lib/photo-backup';
 import { MAX_BACKUP_BYTES, photoError, writePhotos } from '@/lib/photos';
 import { pageHead } from '@/lib/page-head';
@@ -11,7 +11,7 @@ export const Route=createFileRoute('/dane')({head:()=>pageHead('Kopia i przenosz
 function downloadJSON(value:unknown,name:string){const blob=new Blob([JSON.stringify(value)],{type:'application/json'});if(blob.size>MAX_BACKUP_BYTES)throw new Error('Kopia jest większa niż 100 MB. Usuń zbędne zdjęcia lub pobierz zwykły JSON bez zdjęć.');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function DataPage(){
  const {data,update,ready}=useLocalData();const file=useRef<HTMLInputElement>(null);const [message,setMessage]=useState('');const [busy,setBusy]=useState(false);
- async function exportPhotos(){setBusy(true);setMessage('');try{downloadJSON(await makePhotoBackup(data),'moje-przepisy-ze-zdjeciami.json');setMessage('Pobrano kopię ze zdjęciami. Przenieś plik na drugie urządzenie i użyj Import JSON.');}catch(e){setMessage(photoError(e));}finally{setBusy(false);}}
+ async function exportPhotos(){setBusy(true);setMessage('');try{downloadJSON(await makePhotoBackup(dataForBackup(data)),'moje-przepisy-ze-zdjeciami.json');setMessage('Pobrano kopię ze zdjęciami oraz tygodniami 5 i 6. Przenieś plik na drugie urządzenie i użyj Import JSON.');}catch(e){setMessage(photoError(e));}finally{setBusy(false);}}
  async function importFile(selected:File){setBusy(true);setMessage('');let rollback:string[]=[];try{
   if(selected.size>MAX_BACKUP_BYTES)throw new Error('Plik kopii przekracza 100 MB.');const text=await selected.text();const parsed:unknown=JSON.parse(text);const withPhotos=typeof parsed==='object'&&parsed!==null&&'format' in parsed;
   if(withPhotos){if(!window.confirm('Dodać dane i zdjęcia z kopii? Obecne dane i zdjęcia nie zostaną zastąpione. Maksymalnie 5 zdjęć na przepis.'))return;const prepared=await preparePhotoImport(text,data);rollback=prepared.photos.map(p=>p.id);await writePhotos(prepared.photos);if(!update(()=>prepared.data)){await writePhotos([],rollback);rollback=[];throw new Error('Nie udało się zapisać danych. Nowe zdjęcia wycofano, obecne dane zachowano.');}setMessage('Zaimportowano dane i zdjęcia. Są teraz zapisane lokalnie na tym urządzeniu.');}

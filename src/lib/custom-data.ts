@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { recipes, mealSlots, type MealType } from '@/data/recipes';
+import { recipes, weeks, mealSlots, type MealType, type Week } from '@/data/recipes';
 import { ingredients } from '@/data/ingredients';
 import { computeMacros, normalize, recipeItems, ingredientUnit } from '@/lib/meals';
 import { recipeEquipment } from '@/data/equipment';
@@ -8,12 +8,13 @@ export const macroSchema = z.object({ kcal: z.number().finite().nonnegative(), p
 export const ingredientSchema = z.object({ name: z.string().trim().min(1), amount: z.number().finite().positive(), unit: z.enum(['g', 'kg', 'ml', 'l', 'szt.', 'łyżka', 'łyżeczka']) });
 export const customRecipeSchema = z.object({ id: z.string().startsWith('own-'), name: z.string().trim().min(1), category: z.string().trim().min(1), collection: z.string().optional(), equipment: z.array(z.enum(['air-fryer','oven','grill','waffle','stovetop','no-cook','blender'])).optional(), type: z.enum(['sniadanie','obiad','deser','kolacja']), minutes: z.number().finite().int().positive(), servings: z.number().finite().int().positive(), ingredients: z.array(ingredientSchema).min(1), steps: z.array(z.string().trim().min(1)).min(1), macros: macroSchema, partner: z.object({ note: z.string().trim().min(1), extra: z.array(ingredientSchema), macros: macroSchema.optional() }).optional() });
 const daySchema = z.object({ sniadanie: z.string().nullable(), obiad: z.string().nullable(), deser: z.string().nullable(), kolacja: z.string().nullable() });
+const portionsSchema = z.object({ sniadanie:z.number().finite().min(.75).max(1.5).optional(), obiad:z.number().finite().min(.75).max(1.5).optional(), deser:z.number().finite().min(.75).max(1.5).optional(), kolacja:z.number().finite().min(.75).max(1.5).optional() });
 export const WEEK_COLORS = ['week-1','week-2','week-3','week-4','week-5','week-6'] as const;
 export type WeekColor = (typeof WEEK_COLORS)[number];
 export const WEEK_EMOJIS = ['🍳','🥗','🍲','🍝','🍜','🍱','🥑','🍎','🍰','🥘','🧇','🍣','🍕','🥐','🦐','🌮','🥟','🍦','🧁','🥩','🐟','🥦','🫕','🥪','🌶️','🫑','🥕','🍅'] as const;
 export const WEEK_COLOR_LABELS: Record<WeekColor,string> = {'week-1':'kremowy','week-2':'zielony','week-3':'brzoskwiniowy','week-4':'błękitny','week-5':'lawendowy','week-6':'morski'};
 const WEEK_BG: Record<WeekColor,string> = {'week-1':'bg-week-1','week-2':'bg-week-2','week-3':'bg-week-3','week-4':'bg-week-4','week-5':'bg-week-5','week-6':'bg-week-6'};
-export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7), emoji: z.string().trim().min(1).max(8).optional(), color: z.enum(WEEK_COLORS).optional() });
+export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7), portions: z.array(portionsSchema).length(7).optional(), emoji: z.string().trim().min(1).max(8).optional(), color: z.enum(WEEK_COLORS).optional() });
 export function weekColorClass(color:WeekColor):string{ return WEEK_BG[color]; }
 export function weekBgClass(w:{color?:WeekColor|undefined,id:string}):string{ const fallback=WEEK_COLORS[[...w.id].reduce((a,c)=>a+c.charCodeAt(0),0)%WEEK_COLORS.length]; return WEEK_BG[w.color ?? fallback ?? 'week-1']; }
 export function weekEmoji(w:{emoji?:string|undefined}):string{ return w.emoji ?? '🍽️'; }
@@ -33,6 +34,14 @@ export type LocalData = z.infer<typeof dataSchema>;
 export const emptyData: LocalData = { version: 1, recipes: [], weeks: [] };
 export const newId = (kind: 'own' | 'week') => `${kind}-${crypto.randomUUID()}`;
 export function blankWeek(name: string): CustomWeek { return { id:newId('week'), name, days:Array.from({length:7}, () => ({sniadanie:null,obiad:null,deser:null,kolacja:null})) }; }
+export function copyWeek(w: Week): CustomWeek {
+  return { id:newId('week'), name:`${w.title} (moja wersja)`, emoji:w.emoji, color:WEEK_COLORS[w.n-1] ?? 'week-1', days:w.days.map(d=>({...d})), ...(w.portions ? {portions:w.portions.map(p=>({...p}))} : {}) };
+}
+// Bundled plans need not live in localStorage; include portable local copies in exports.
+export function dataForBackup(data: LocalData): LocalData {
+  const added = weeks.filter(w=>w.n>=5).map(w=>({...copyWeek(w),id:`week-original-${w.n}`}));
+  return {...data,weeks:[...data.weeks,...added.filter(w=>!data.weeks.some(x=>x.id===w.id))]};
+}
 export function deleteRecipe(data: LocalData, id: string): LocalData { const reviews={...data.reviews};delete reviews[id];return {...data,...(data.reviews?{reviews}:{}), recipes:data.recipes.filter(r => r.id !== id), weeks:data.weeks.map(w => ({...w,days:w.days.map(d => Object.fromEntries(Object.entries(d).map(([slot,rid]) => [slot, rid === id ? null : rid])) as CustomWeek['days'][number])}))}; }
 export function parseImport(text: string): LocalData { return dataSchema.parse(JSON.parse(text)); }
 export function mergeImport(current: LocalData, incoming: LocalData, recipeRemap?: Map<string,string>): LocalData {
@@ -57,13 +66,13 @@ export function copyOriginal(id: string, protein = false): CustomRecipe | undefi
 export type ShopItem = { id:string; name:string; amount:number; unit:string };
 export function customShopping(w: CustomWeek, custom: CustomRecipe[], portions=1): ShopItem[] {
   const map=new Map<string,ShopItem>();
-  for (const day of w.days) for (const slot of mealSlots) {
+  for (const [index, day] of w.days.entries()) for (const slot of mealSlots) {
     const id=day[slot.type]; if(!id) continue;
     const own=custom.find(r=>r.id===id); const original=recipes.find(r=>r.id===id);
     const items: CustomIngredient[]=own ? own.ingredients : original?.ingredients.map(([iid,g])=>({name:ingredients[iid].name,amount:g,unit:ingredientUnit(iid)})) ?? [];
     for (const i of items) {
       const unit=i.unit==='kg'?'g':i.unit==='l'?'ml':i.unit;
-      const amount=i.amount*(i.unit==='kg'||i.unit==='l'?1000:1)*portions/(own?.servings ?? 1);
+      const amount=i.amount*(i.unit==='kg'||i.unit==='l'?1000:1)*portions*(w.portions?.[index]?.[slot.type] ?? 1)/(own?.servings ?? 1);
       const key=`${normalize(i.name)}:${unit}`; const prev=map.get(key);
       map.set(key,{id:key,name:prev?.name ?? i.name,unit,amount:(prev?.amount ?? 0)+amount});
     }

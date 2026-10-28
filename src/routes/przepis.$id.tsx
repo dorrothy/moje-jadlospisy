@@ -13,8 +13,10 @@ import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, 
 import { useFavorites } from "@/lib/storage";
 import { RecipeReview, ReviewSummary } from '@/components/RecipeReview';
 import { RecipePhotos } from '@/components/RecipePhotos';
+import { z } from 'zod';
 
 export const Route = createFileRoute("/przepis/$id")({
+  validateSearch:z.object({porcje:z.number().finite().min(.75).max(20).optional()}),
   loader: ({ params }) => {
     const recipe = recipeById[params.id];
     if (!recipe && !params.id.startsWith("own-")) throw notFound();
@@ -52,11 +54,12 @@ function OriginalRecipePage() {
   const [copy, setCopy] = useState<CustomRecipe | undefined>();
   const router = useRouter();
   const { isFav, toggle } = useFavorites();
-  const [servings, setServings] = useState(1);
+  const { porcje = 1 } = Route.useSearch();
+  const [servings, setServings] = useState(porcje);
   const [forHim, setForHim] = useState(false);
   const [protein, setProtein] = useState(false);
   if (!recipe) return null;
-  const m = computeMacros(recipeItems(recipe,false,protein));
+  const m = computeMacros(recipeItems(recipe,false,protein).map(([id,g])=>[id,g*servings]));
   const partnerM = recipe.partner ? computeMacros(recipeItems(recipe, true, protein)) : null;
   const shown = forHim && partnerM ? partnerM : m;
   const fav = isFav(recipe.id);
@@ -97,7 +100,7 @@ function OriginalRecipePage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground">
-          Wartości szacunkowe na 1 porcję{forHim ? " (wersja dla chłopaka)" : ""}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
+          Wartości szacunkowe: {forHim ? '1 większa porcja chłopaka' : `${servings.toLocaleString('pl')} × porcja bazowa`}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
         </p>
         {recipe.rawWeights && <p className="mt-2 text-xs text-muted-foreground">Masy przed obróbką: jajka bez skorupki, owoce i warzywa bez niejadalnych części, konserwy odsączone. Ryż i makaron ważone na sucho. Drobne przyprawy bez gramatur nie są wliczone.</p>}
         {shown.missing.length > 0 && (
@@ -129,9 +132,9 @@ function OriginalRecipePage() {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Składniki</h2>
           <div className="flex items-center gap-2 rounded-full bg-card p-1 shadow-soft">
-            <button aria-label="Mniej porcji" onClick={() => setServings((s) => Math.max(1, s - 1))} className="rounded-full p-1.5"><Minus className="h-4 w-4" /></button>
+            <Button size="icon" variant="ghost" disabled={forHim} aria-label="Mniej porcji" onClick={() => setServings((s) => Math.max(.75, s - .25))}><Minus className="h-4 w-4" /></Button>
             <span className="min-w-16 text-center text-sm font-medium">{servings} {servings === 1 ? "porcja" : servings < 5 ? "porcje" : "porcji"}</span>
-            <button aria-label="Więcej porcji" onClick={() => setServings((s) => s + 1)} className="rounded-full p-1.5"><Plus className="h-4 w-4" /></button>
+            <Button size="icon" variant="ghost" disabled={forHim} aria-label="Więcej porcji" onClick={() => setServings((s) => Math.min(20, s + .25))}><Plus className="h-4 w-4" /></Button>
           </div>
         </div>
         <div className="mt-3 overflow-hidden rounded-2xl border bg-card">
@@ -141,14 +144,15 @@ function OriginalRecipePage() {
             </thead>
             <tbody>
               {recipeItems(recipe, forHim, protein).map((it, i) => {
-                const im = itemMacros([it[0], it[1] * servings]);
+                const amount = it[1] * (forHim ? 1 : servings);
+                const im = itemMacros([it[0], amount]);
                 return (
                   <tr key={i} className="border-t">
                     <td className="px-3 py-2.5">
                       {ingredients[it[0]].name}
                       {it[2] && <span className="ml-1 text-xs text-muted-foreground">({it[2]})</span>}
                     </td>
-                    <td className="px-2 py-2.5 text-right font-medium tabular-nums">{formatItemAmount(it[0],it[1] * servings)}</td>
+                    <td className="px-2 py-2.5 text-right font-medium tabular-nums">{formatItemAmount(it[0],amount)}</td>
                     <td className="px-3 py-2.5 text-right text-xs tabular-nums text-muted-foreground">
                       {im ? `${im.kcal} / ${im.p} g` : <span className="text-warning-foreground">do uzupełnienia</span>}
                     </td>
