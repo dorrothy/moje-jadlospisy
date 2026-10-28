@@ -12,7 +12,7 @@ import { searchRecipes, typeLabel } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import type { MealType } from "@/data/recipes";
 import { equipmentLabels, recipeEquipment, type Equipment } from '@/data/equipment';
-import { polishCollection } from '@/data/recipes-polish';
+import { recipes } from '@/data/recipes';
 import { reviewMatches, reviewSort } from '@/lib/reviews';
 
 export const Route = createFileRoute("/szukaj")({
@@ -79,7 +79,7 @@ export function RecipeBrowser({ favOnly = false }: { favOnly?: boolean }) {
         {!favOnly && <Chip active={onlyFav} onClick={() => setOnlyFav((v) => !v)}>♥ Ulubione</Chip>}
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <label className="text-sm">Kolekcja<select className="mt-1 h-10 w-full rounded-md border bg-card px-3" value={collection ?? ''} onChange={e=>setCollection(e.target.value || undefined)}><option value="">Wszystkie kolekcje</option><option value={polishCollection}>{polishCollection}</option></select></label>
+        <label className="text-sm">Kolekcja<select className="mt-1 h-10 w-full rounded-md border bg-card px-3" value={collection ?? ''} onChange={e=>setCollection(e.target.value || undefined)}><option value="">Wszystkie kolekcje</option>{[...new Set([...recipes,...data.recipes].map(r=>r.collection).filter((c):c is string=>Boolean(c)))].sort((a,b)=>a.localeCompare(b,'pl')).map(c=><option key={c} value={c}>{c}</option>)}</select></label>
         <label className="text-sm">Sprzęt<select className="mt-1 h-10 w-full rounded-md border bg-card px-3" value={equipment ?? ''} onChange={e=>setEquipment(e.target.value ? e.target.value as Equipment : undefined)}><option value="">Dowolny sprzęt</option>{Object.entries(equipmentLabels).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3"><label className="text-sm">Ocena od<select aria-label="Ocena od" value={minimum} onChange={e=>setMinimum(Number(e.target.value))} className="mt-1 h-10 w-full rounded-md border bg-card px-2"><option value="0">Dowolna</option>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n} ★</option>)}</select></label><label className="text-sm">Sortowanie<select aria-label="Sortowanie" value={sort} onChange={e=>setSort(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-2"><option value="default">Domyślne</option><option value="rating">Najwyższa ocena</option><option value="cooked">Ostatnio gotowane</option></select></label></div><label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={tested} onChange={e=>setTested(e.target.checked)}/>Sprawdzone (z datą gotowania)</label>

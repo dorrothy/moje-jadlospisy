@@ -4,6 +4,8 @@ export const equipmentLabels = {
   grill: 'Grill elektryczny',
   waffle: 'Gofrownica',
   stovetop: 'Patelnia / garnek',
+  'no-cook': 'Bez gotowania',
+  blender: 'Blender',
 } as const;
 export type Equipment = keyof typeof equipmentLabels;
 

@@ -31,7 +31,7 @@ export const collectionRecipes:Recipe[] = [
  'Halloumi osusz i pokrój w plastry. Na suchej patelni nieprzywierającej smaż po 2–3 minuty z każdej strony do zrumienienia.',
  'Jogurt wymieszaj z sokiem cytryny i pieprzem. Połącz kaszę i warzywa, polej sosem, ułóż ciepły ser i posyp granatem.'
  ],[['c_halloumi',100],['c_bulgur',80]]),
- dish('tunczyk-jajko','Sałatka z tuńczykiem i jajkiem','Sałatki',30,['stovetop'],[['c_tuna',120],['n_jajko',55],['n_ziemniak',160],['n_fasolka',120],['c_tomatoes',120],['salata',70],['mleko',0.01],['n_jogurt',60],['musztarda',8],['n_oliwa',5]],[
+ dish('tunczyk-jajko','Sałatka z tuńczykiem i jajkiem','Sałatki',30,['stovetop'],[['c_tuna',120],['n_jajko',55],['n_ziemniak',160],['n_fasolka',120],['c_tomatoes',120],['salata',70],['n_jogurt',60],['musztarda',8],['n_oliwa',5]],[
  'Ziemniaki obierz, odważ i pokrój na równe kawałki. Gotuj w wodzie 15–20 minut do miękkości, następnie odcedź.',
  'Jajko ugotuj na twardo przez 9–10 minut od zagotowania, schłodź i obierz. Fasolkę gotuj osobno 8–12 minut do miękkości; odcedź.',
  'Umyj i osusz sałatę oraz pomidorki. Odważ odsączonego tuńczyka, jajko pokrój na ćwiartki.',

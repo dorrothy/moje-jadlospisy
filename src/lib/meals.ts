@@ -30,9 +30,17 @@ export function itemMacros([id, g]: Item) {
 }
 
 /** Full partner quantities replace the base; legacy extras remain additive. */
-export function recipeItems(recipe: Recipe, forHim = false): Item[] {
-  if (!forHim || !recipe.partner) return recipe.ingredients;
-  return recipe.partner.ingredients ?? [...recipe.ingredients, ...recipe.partner.extra];
+export function recipeItems(recipe: Recipe, forHim = false, protein = false): Item[] {
+  const base = forHim && recipe.partner ? recipe.partner.ingredients ?? [...recipe.ingredients, ...recipe.partner.extra] : recipe.ingredients;
+  return protein && recipe.proteinVariant ? [...base, ...recipe.proteinVariant.extra] : base;
+}
+
+/** Explicit liquid units; never infer density or turn dry ingredients into ml. */
+export function ingredientUnit(id: IngredientId): 'g' | 'ml' {
+  return ['c_espresso','c_stock','c_water'].includes(id) ? 'ml' : 'g';
+}
+export function formatItemAmount(id: IngredientId, amount: number) {
+  return ingredientUnit(id) === 'ml' ? `${Math.round(amount)} ml` : formatGrams(amount);
 }
 
 /** Normalizacja do wyszukiwania bez polskich znaków. */

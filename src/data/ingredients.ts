@@ -4,6 +4,7 @@
 
 import { newNutrition } from './nutrition-new';
 import { polishNutrition } from './nutrition-polish';
+import { collectionNutrition } from './nutrition-collections';
 
 export type Ingredient = {
   name: string;
@@ -16,6 +17,7 @@ export type Ingredient = {
 };
 
 export const ingredients = {
+  ...collectionNutrition,
   ...polishNutrition,
   ...newNutrition,
   // Mięso i ryby
