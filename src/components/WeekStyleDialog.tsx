@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { WEEK_COLORS, WEEK_EMOJIS, WEEK_COLOR_LABELS, weekBgClass, type WeekColor } from "@/lib/custom-data";
+import { WEEK_COLORS, WEEK_EMOJIS, WEEK_COLOR_LABELS, weekColorClass, type WeekColor } from "@/lib/custom-data";
 import { cn } from "@/lib/utils";
 
 export function WeekStyleDialog({ open, initial, onSave, onCancel }: {
