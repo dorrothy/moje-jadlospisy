@@ -33,14 +33,16 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
           {recipe.partner && <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">+ wersja dla niego</span>}
         </div>
       </Link>
-      <RecipeReview id={recipe.id} compact/>
-      <button
-        aria-label={fav ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
-        onClick={() => toggle(recipe.id)}
-        className="relative z-10 -m-1 self-start rounded-full p-2 text-primary"
-      >
-        <Heart className={`h-5 w-5 ${fav ? "fill-primary" : ""}`} />
-      </button>
+        <div className="relative z-10 flex shrink-0 items-center self-start gap-0.5">
+          <RecipeReview id={recipe.id} compact/>
+          <button
+            aria-label={fav ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+            onClick={() => toggle(recipe.id)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-primary"
+          >
+            <Heart className={`h-5 w-5 ${fav ? "fill-primary" : ""}`} />
+          </button>
+        </div>
     </div>
   );
 }
