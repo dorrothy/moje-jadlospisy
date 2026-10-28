@@ -46,6 +46,6 @@ describe('rozszerzenie: śniadania na słono, bowle, loaded fries, zapiekanki, s
     expect(pools).toContain('ext-jajka-po-turecku');
   });
   it('oryginalne tygodnie bez zmian', () => {
-    expect(weeks.slice(0, 4).map(w => w.days)).toEqual(originalAssignments);
+    expect(weeks.filter(w => w.n <= 4).flatMap(w => w.days.map(d => [d.sniadanie, d.obiad, d.deser, d.kolacja]))).toEqual(originalAssignments);
   });
 });
