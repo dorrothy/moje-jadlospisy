@@ -14,8 +14,8 @@ export const WEEK_EMOJIS = ['🍳','🥗','🍲','🍝','🍜','🍱','🥑','�
 export const WEEK_COLOR_LABELS: Record<WeekColor,string> = {'week-1':'kremowy','week-2':'zielony','week-3':'brzoskwiniowy','week-4':'błękitny','week-5':'lawendowy','week-6':'morski'};
 const WEEK_BG: Record<WeekColor,string> = {'week-1':'bg-week-1','week-2':'bg-week-2','week-3':'bg-week-3','week-4':'bg-week-4','week-5':'bg-week-5','week-6':'bg-week-6'};
 export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7), emoji: z.string().trim().min(1).max(8).optional(), color: z.enum(WEEK_COLORS).optional() });
-export function weekBgClass(w:{color?:WeekColor,id:string}):string{ return WEEK_BG[w.color ?? WEEK_COLORS[[...w.id].reduce((a,c)=>a+c.charCodeAt(0),0)%WEEK_COLORS.length]]; }
-export function weekEmoji(w:{emoji?:string}):string{ return w.emoji ?? '🍽️'; }
+export function weekBgClass(w:{color?:WeekColor|undefined,id:string}):string{ return WEEK_BG[w.color ?? WEEK_COLORS[[...w.id].reduce((a,c)=>a+c.charCodeAt(0),0)%WEEK_COLORS.length]]; }
+export function weekEmoji(w:{emoji?:string|undefined}):string{ return w.emoji ?? '🍽️'; }
 export const reviewSchema = z.object({ rating:z.number().int().min(1).max(5).optional(), note:z.string(), cooked:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{const d=new Date(v);return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;}).or(z.literal('')) });
 export const pantrySchema = z.object({name:z.string().trim().min(1),amount:z.number().finite().positive().optional(),unit:ingredientSchema.shape.unit});
 export const extraShopSchema = ingredientSchema.extend({checked:z.boolean().optional()});
