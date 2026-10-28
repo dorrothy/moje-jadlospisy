@@ -1,7 +1,7 @@
 # Zadania
-- [ ] Dodać 24 przepisy: Sałatki 6, Deserki 8, Azjatyckie 5, Włoskie 5
-- [ ] Osobne makro gnocchi z kurczakiem i większe porcje dań głównych
-- [ ] Sprawdzić kolekcje, generator, zakupy i zachowanie istniejących danych
+- [x] Dodać 24 przepisy: Sałatki 6, Deserki 8, Azjatyckie 5, Włoskie 5
+- [x] Osobne makro gnocchi z kurczakiem i większe porcje dań głównych
+- [x] Sprawdzić kolekcje, generator, zakupy i zachowanie istniejących danych
 - [x] Lokalne zdjęcia Blob w IndexedDB: galeria, aparat, podgląd i zarządzanie
 - [x] Kompresja, limity, obsługa błędów i kopia/import ze zdjęciami
 - [x] Testy zdjęć, zachowania danych i przenoszenia między urządzeniami
