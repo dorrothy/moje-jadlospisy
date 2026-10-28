@@ -1,4 +1,7 @@
 # Zadania
+- [ ] Dodać 24 pełne przepisy z dokładnymi gramaturami i zachować oryginalne tygodnie
+- [ ] Obliczenia z jawnej tabeli na 100 g i 12 oddzielnych porcji chłopaka
+- [ ] Sprawdzić makro, gramatury, wyszukiwanie, ulubione, tygodnie i zakupy
 - [x] Zmiana nazwy i metadanych
 - [x] Lokalne przepisy: formularz, edycja, kopia, usuwanie
 - [x] Własne tygodnie i przypisywanie wszystkich przepisów
