@@ -2,10 +2,11 @@ import { z } from 'zod';
 import { recipes, mealSlots, type MealType } from '@/data/recipes';
 import { ingredients } from '@/data/ingredients';
 import { computeMacros, normalize, recipeItems } from '@/lib/meals';
+import { recipeEquipment } from '@/data/equipment';
 
 export const macroSchema = z.object({ kcal: z.number().finite().nonnegative(), p: z.number().finite().nonnegative(), f: z.number().finite().nonnegative(), c: z.number().finite().nonnegative() });
 export const ingredientSchema = z.object({ name: z.string().trim().min(1), amount: z.number().finite().positive(), unit: z.enum(['g', 'kg', 'ml', 'l', 'szt.', 'łyżka', 'łyżeczka']) });
-export const customRecipeSchema = z.object({ id: z.string().startsWith('own-'), name: z.string().trim().min(1), category: z.string().trim().min(1), type: z.enum(['sniadanie','obiad','deser','kolacja']), minutes: z.number().finite().int().positive(), servings: z.number().finite().int().positive(), ingredients: z.array(ingredientSchema).min(1), steps: z.array(z.string().trim().min(1)).min(1), macros: macroSchema, partner: z.object({ note: z.string().trim().min(1), extra: z.array(ingredientSchema), macros: macroSchema.optional() }).optional() });
+export const customRecipeSchema = z.object({ id: z.string().startsWith('own-'), name: z.string().trim().min(1), category: z.string().trim().min(1), collection: z.string().optional(), equipment: z.array(z.enum(['air-fryer','oven','grill','waffle','stovetop'])).optional(), type: z.enum(['sniadanie','obiad','deser','kolacja']), minutes: z.number().finite().int().positive(), servings: z.number().finite().int().positive(), ingredients: z.array(ingredientSchema).min(1), steps: z.array(z.string().trim().min(1)).min(1), macros: macroSchema, partner: z.object({ note: z.string().trim().min(1), extra: z.array(ingredientSchema), macros: macroSchema.optional() }).optional() });
 const daySchema = z.object({ sniadanie: z.string().nullable(), obiad: z.string().nullable(), deser: z.string().nullable(), kolacja: z.string().nullable() });
 export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7) });
 export const dataSchema = z.object({ version: z.literal(1), recipes: z.array(customRecipeSchema), weeks: z.array(customWeekSchema) }).superRefine((data, ctx) => {
@@ -29,14 +30,14 @@ export function mergeImport(current: LocalData, incoming: LocalData): LocalData 
   const weekIds = new Set(current.weeks.map(w=>w.id));
   return {...current, recipes:[...current.recipes,...added], weeks:[...current.weeks,...incoming.weeks.map(w=>{ const id=weekIds.has(w.id)?newId('week'):w.id; weekIds.add(id); return {...w,id,days:w.days.map(d=>Object.fromEntries(Object.entries(d).map(([s,r])=>[s,r ? remap.get(r) ?? r : null])) as CustomWeek['days'][number])}; })]};
 }
-export function matchesCustom(r: CustomRecipe, q: string) { const hay=normalize([r.name,r.category,r.partner?.note ?? '',...r.ingredients.map(i=>i.name)].join(' ')); return normalize(q).split(/\s+/).every(t=>hay.includes(t)); }
+export function matchesCustom(r: CustomRecipe, q: string) { const hay=normalize([r.name,r.category,r.collection ?? '',r.partner?.note ?? '',...r.ingredients.map(i=>i.name)].join(' ')); return normalize(q).split(/\s+/).every(t=>hay.includes(t)); }
 export function copyOriginal(id: string): CustomRecipe | undefined {
   const r=recipes.find(r=>r.id===id); if(!r) return;
   const convert = (items: typeof r.ingredients): CustomIngredient[] => items.map(([id,amount]) => ({name:ingredients[id].name,amount,unit:'g'}));
   const m=computeMacros(r.ingredients);
   const extra = r.partner?.ingredients ? r.partner.ingredients.map(([id,g]) => [id,g - (r.ingredients.find(([base])=>base===id)?.[1] ?? 0)] as typeof r.ingredients[number]).filter(([,g])=>g>0) : r.partner?.extra ?? [];
   const pm = r.partner ? computeMacros(recipeItems(r,true)) : undefined;
-  return { id:newId('own'),name:`${r.name} — kopia`,category:r.category,type:r.type,minutes:r.minutes,servings:1,ingredients:convert(r.ingredients),steps:[...r.steps],macros:{kcal:m.kcal,p:m.p,f:m.f,c:m.c},partner:r.partner ? {note:r.partner.note,extra:convert(extra),macros:pm ? {kcal:pm.kcal,p:pm.p,f:pm.f,c:pm.c} : undefined} : undefined };
+  return { id:newId('own'),name:`${r.name} — kopia`,category:r.category,collection:r.collection,equipment:recipeEquipment(r),type:r.type,minutes:r.minutes,servings:1,ingredients:convert(r.ingredients),steps:[...r.steps],macros:{kcal:m.kcal,p:m.p,f:m.f,c:m.c},partner:r.partner ? {note:r.partner.note,extra:convert(extra),macros:pm ? {kcal:pm.kcal,p:pm.p,f:pm.f,c:pm.c} : undefined} : undefined };
 }
 export type ShopItem = { id:string; name:string; amount:number; unit:string };
 export function customShopping(w: CustomWeek, custom: CustomRecipe[], portions=1): ShopItem[] {

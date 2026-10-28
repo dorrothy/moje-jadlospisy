@@ -11,6 +11,8 @@ import { MealCard } from "@/components/MealCard";
 import { searchRecipes, typeLabel } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import type { MealType } from "@/data/recipes";
+import { equipmentLabels, recipeEquipment, type Equipment } from '@/data/equipment';
+import { polishCollection } from '@/data/recipes-polish';
 
 export const Route = createFileRoute("/szukaj")({
   head: () => ({
@@ -40,11 +42,13 @@ export function RecipeBrowser({ favOnly = false }: { favOnly?: boolean }) {
   const [q, setQ] = useState("");
   const [week, setWeek] = useState<number | undefined>();
   const [type, setType] = useState<MealType | undefined>();
+  const [equipment, setEquipment] = useState<Equipment | undefined>();
+  const [collection, setCollection] = useState<string | undefined>();
   const [onlyFav, setOnlyFav] = useState(favOnly);
   const { favs } = useFavorites();
-  const results = searchRecipes(q, { week, type, favs: onlyFav ? favs : undefined });
+  const results = searchRecipes(q, { week, type, equipment, collection, favs: onlyFav ? favs : undefined });
 
-  const ownResults = data.recipes.filter(r => matchesCustom(r, q) && (!type || r.type === type) && (!onlyFav || favs.includes(r.id)) && !week);
+  const ownResults = data.recipes.filter(r => matchesCustom(r, q) && (!type || r.type === type) && (!equipment || recipeEquipment(r).includes(equipment)) && (!collection || r.collection === collection) && (!onlyFav || favs.includes(r.id)) && !week);
   return (
     <>
       <div className="mt-4 flex flex-wrap gap-2"><Button disabled={!ready} onClick={() => setCreating(true)}>+ Nowy przepis</Button><Button asChild variant="outline"><Link to="/dane">Kopia danych</Link></Button></div>
@@ -68,6 +72,10 @@ export function RecipeBrowser({ favOnly = false }: { favOnly?: boolean }) {
       <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
         {(Object.keys(typeLabel) as MealType[]).map((t) => <Chip key={t} active={type === t} onClick={() => setType(type === t ? undefined : t)}>{typeLabel[t]}</Chip>)}
         {!favOnly && <Chip active={onlyFav} onClick={() => setOnlyFav((v) => !v)}>♥ Ulubione</Chip>}
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="text-sm">Kolekcja<select className="mt-1 h-10 w-full rounded-md border bg-card px-3" value={collection ?? ''} onChange={e=>setCollection(e.target.value || undefined)}><option value="">Wszystkie kolekcje</option><option value={polishCollection}>{polishCollection}</option></select></label>
+        <label className="text-sm">Sprzęt<select className="mt-1 h-10 w-full rounded-md border bg-card px-3" value={equipment ?? ''} onChange={e=>setEquipment(e.target.value ? e.target.value as Equipment : undefined)}><option value="">Dowolny sprzęt</option>{Object.entries(equipmentLabels).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label>
       </div>
       <p className="mt-4 text-xs text-muted-foreground">{results.length + ownResults.length} przepisów</p>
       <div className="mt-2 space-y-3">

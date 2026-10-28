@@ -3,6 +3,7 @@ import { Heart, Clock } from "lucide-react";
 import type { Recipe } from "@/data/recipes";
 import { computeMacros } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
+import { equipmentLabels, recipeEquipment } from '@/data/equipment';
 
 export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: string; label?: string }) {
   const m = computeMacros(recipe.ingredients);
@@ -23,6 +24,8 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
           <span>~{m.kcal} kcal{m.missing.length ? "*" : ""}</span>
           <span>B {m.p} g</span>
           {recipe.rawWeights && <span>makro szacunkowe</span>}
+          {recipe.collection && <span>{recipe.collection}</span>}
+          {recipeEquipment(recipe).map(id=><span key={id}>{equipmentLabels[id]}</span>)}
           {recipe.partner && <span className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">+ wersja dla niego</span>}
         </div>
       </Link>
