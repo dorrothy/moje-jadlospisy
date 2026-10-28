@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 
 const PREFIX = "m4t:";
@@ -24,7 +25,8 @@ export function useStored<T>(key: string, initial: T) {
     (next: T | ((prev: T) => T)) => {
       setValue((prev) => {
         const v = typeof next === "function" ? (next as (p: T) => T)(prev) : next;
-        localStorage.setItem(PREFIX + key, JSON.stringify(v));
+        try { localStorage.setItem(PREFIX + key, JSON.stringify(v)); }
+        catch { toast.error("Nie udało się zapisać zmian na urządzeniu."); return prev; }
         queueMicrotask(() => window.dispatchEvent(new CustomEvent("m4t-sync", { detail: { key, value: v } })));
         return v;
       });
