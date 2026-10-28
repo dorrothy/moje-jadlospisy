@@ -7,6 +7,7 @@ import { polishRecipes } from './recipes-polish';
 import { collectionRecipes } from './recipes-collections';
 import type { Equipment } from './equipment';
 import { additionalWeeks } from './weeks-new';
+import { bakingRecipes } from './recipes-baking';
 
 export type MealType = "sniadanie" | "obiad" | "deser" | "kolacja";
 export type Item = [IngredientId, number, string?]; // [składnik, gramy, uwaga]
@@ -41,6 +42,7 @@ const pasta = (g = 90): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopak
 const potato = (g = 250): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopaka: ${g} g gotowanych ziemniaków do tej samej porcji.`, extra: [["ziemniak", g]] });
 
 export const recipes: Recipe[] = [
+  ...bakingRecipes,
   ...collectionRecipes,
   ...polishRecipes,
   ...newRecipes,
