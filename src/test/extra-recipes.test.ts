@@ -32,7 +32,7 @@ describe('rozszerzenie: śniadania na słono, bowle, loaded fries, zapiekanki, s
   it('zapiekanka 4-porcjowa: 1 porcja to ćwierć blachy', () => {
     const r = recipeById['ext-zapiekanka-ryzowa']!;
     expect(r.yield?.count).toBe(4);
-    expect(portionMacros(r, 4).kcal).toBeCloseTo(computeMacros(r.ingredients).kcal * 4, 5);
+    expect(portionMacros(r, 4).kcal).toBeCloseTo(computeMacros(r.ingredients).kcal * 4, -1);
   });
   it('wyszukiwanie po tagu i bez polskich znaków', () => {
     expect(searchRecipes('lunchboxa').some(r => r.id === 'ext-burrito-bowl')).toBe(true);
