@@ -30,3 +30,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Prywatne dane użytkowniczki — nigdy do repozytorium
+*backup*.json
+moje-przepisy*.json
+lets-cook*.json
+*.heic
