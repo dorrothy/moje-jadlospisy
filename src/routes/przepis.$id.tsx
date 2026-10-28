@@ -174,11 +174,26 @@ function OriginalRecipePage() {
           {recipe.steps.map((s, i) => (
             <li key={i} className="flex gap-3 rounded-2xl bg-card p-4">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{i + 1}</span>
-              <p className="pt-0.5 text-[15px] leading-relaxed">{s}</p>
+          <p className="pt-0.5 text-[15px] leading-relaxed">{s}</p>
             </li>
           ))}
         </ol>
       </section>
     </main>
+  );
+}
+
+function YieldInfo({ recipe }: { recipe: Recipe }) {
+  const y = recipe.yield!;
+  const batch = portionMacros(recipe, y.count);
+  const per100 = y.bakedGrams ? { kcal: Math.round(batch.kcal / y.bakedGrams * 100), p: Math.round(batch.p / y.bakedGrams * 1000) / 10, f: Math.round(batch.f / y.bakedGrams * 1000) / 10, c: Math.round(batch.c / y.bakedGrams * 1000) / 10 } : null;
+  return (
+    <section className="mt-3 rounded-2xl border bg-card p-4 text-sm">
+      <h2 className="font-bold">Cała partia: {y.count} {y.unit}{y.bakedGrams ? ` · ok. ${y.bakedGrams} g po wypieku` : ""}</h2>
+      <p className="mt-1 text-muted-foreground">Składniki poniżej są za 1 {y.unit} — w planie i zakupach 1 porcja = 1 {y.unit}, nigdy cała partia.</p>
+      <p className="mt-2">Partia ({y.count} {y.unit}): <strong>{batch.kcal} kcal</strong> · B {batch.p} g · T {batch.f} g · W {batch.c} g</p>
+      {per100 && <p className="mt-1">Na 100 g wypieku: <strong>{per100.kcal} kcal</strong> · B {per100.p} g · T {per100.f} g · W {per100.c} g</p>}
+      <p className="mt-2 text-[11px] text-muted-foreground">Wartości szacunkowe, liczone z tabeli składników przed pieczeniem.</p>
+    </section>
   );
 }
