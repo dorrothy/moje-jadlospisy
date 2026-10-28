@@ -31,3 +31,5 @@ Lodówka, generator i oceny: zweryfikowano w przeglądarce na 390×844 brakując
 
 Zdjęcia: 105 testów przeszło. Chromium 390×844: galeria, 3200×2400 → JPEG Blob 1600×1200, reload, główne/dodatkowe zdjęcie, zakończona zmiana, podgląd, usunięcie, błąd nieczytelnego HEIC bez utraty zdjęcia, eksport i import do pustego profilu. Własny przepis i kolizja ID importu: dwa odrębne przepisy z właściwymi zdjęciami. 1280×1800 bez przepełnienia, bez błędów przeglądarki. Fizyczny aparat i rzeczywisty dekoder HEIC na iOS nie były dostępne do testu; używany natywny wybór pliku/capture z bezpiecznym komunikatem błędu.
 - [x] Estetyka: kolor i ikonka dla własnych tygodni (kafelki jak oryginalne, wybór w edytorze tygodnia)
+- [x] Więcej ikonek tygodni (28 do wyboru) i napis „← Powrót do menu"
+- [x] Nazwa aplikacji „Let's cook" i edytowalny nagłówek na stronie głównej
