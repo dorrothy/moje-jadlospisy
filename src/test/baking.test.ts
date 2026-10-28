@@ -86,7 +86,7 @@ describe("28 nowych przepisów: ryby, owsianki, shake'i, ciasteczka, pieczywo", 
     const copy = copyOriginal('wypieki-focaccia');
     expect(copy?.ingredients.find(i => i.name === 'Mąka pszenna')?.amount).toBe(33.5);
   });
-  it('shake'i mają wariant z odżywką i makro wyższe o białko odżywki', () => {
+  it("shake'i mają wariant z odżywką i makro wyższe o białko odżywki", () => {
     for (const r of bakingRecipes.filter(r => r.collection === "Shake'i")) {
       expect(r.proteinVariant?.extra).toEqual([['bialko_serwatkowe', 15]]);
       const base = computeMacros(r.ingredients);
