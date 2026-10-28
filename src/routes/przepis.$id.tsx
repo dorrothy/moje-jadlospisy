@@ -8,6 +8,7 @@ import { copyOriginal, type CustomRecipe } from "@/lib/custom-data";
 import { useState } from "react";
 import { recipeById } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
+import { equipmentLabels, recipeEquipment } from '@/data/equipment';
 import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatGrams, recipeItems } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 
@@ -74,6 +75,8 @@ function OriginalRecipePage() {
         <div className="flex flex-wrap gap-2 text-xs font-medium">
           <span className="rounded-full bg-card px-2.5 py-1">{typeLabel[recipe.type]}</span>
           <span className="rounded-full bg-card px-2.5 py-1">{recipe.category}</span>
+          {recipe.collection && <span className="rounded-full bg-card px-2.5 py-1">{recipe.collection}</span>}
+          {recipeEquipment(recipe).map(id=><span key={id} className="rounded-full bg-card px-2.5 py-1">{equipmentLabels[id]}</span>)}
           <span className="inline-flex items-center gap-1 rounded-full bg-card px-2.5 py-1"><Clock className="h-3 w-3" />{recipe.minutes} min</span>
           {weeksOfRecipe(recipe.id).map((w) => (
             <Link key={w} to="/tydzien/$n" params={{ n: String(w) }} className="rounded-full bg-card px-2.5 py-1 text-primary">Tydz. {w}</Link>
@@ -90,7 +93,7 @@ function OriginalRecipePage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground">
-          Wartości szacunkowe na 1 porcję{forHim ? " (wersja dla chłopaka)" : ""}, wyliczone z tabeli składników.
+          Wartości szacunkowe na 1 porcję{forHim ? " (wersja dla chłopaka)" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
         </p>
         {recipe.rawWeights && <p className="mt-2 text-xs text-muted-foreground">Masy przed obróbką: jajka bez skorupki, owoce i warzywa bez niejadalnych części, konserwy odsączone. Ryż i makaron ważone na sucho. Drobne przyprawy bez gramatur nie są wliczone.</p>}
         {shown.missing.length > 0 && (

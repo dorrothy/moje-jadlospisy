@@ -15,3 +15,4 @@
 
 - Add recipe collections via the shared bundled recipe index and isolate new nutrition profiles so previous recipe values and week assignments remain unchanged.
 - Explicit partner ingredient lists replace the base portion; legacy extra ingredients remain additive, preventing double counting.
+- Equipment uses optional shared tags and read-time inference for legacy recipes; optional validated custom tags preserve old local exports without rewriting user data.

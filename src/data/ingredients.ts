@@ -3,6 +3,7 @@
 // Pole ustawione na null = brak danych → w aplikacji pokaże się "do uzupełnienia".
 
 import { newNutrition } from './nutrition-new';
+import { polishNutrition } from './nutrition-polish';
 
 export type Ingredient = {
   name: string;
@@ -15,6 +16,7 @@ export type Ingredient = {
 };
 
 export const ingredients = {
+  ...polishNutrition,
   ...newNutrition,
   // Mięso i ryby
   piers_kurczaka: { name: "Pierś z kurczaka", aisle: "Mięso i ryby", kcal: 110, p: 23, f: 1.5, c: 0 },

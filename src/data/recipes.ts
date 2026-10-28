@@ -3,6 +3,8 @@
 // z tabeli w ingredients.ts — zmień gramy tutaj, a wartości w ingredients.ts.
 import type { IngredientId } from "./ingredients";
 import { newRecipes } from './recipes-new';
+import { polishRecipes } from './recipes-polish';
+import type { Equipment } from './equipment';
 
 export type MealType = "sniadanie" | "obiad" | "deser" | "kolacja";
 export type Item = [IngredientId, number, string?]; // [składnik, gramy, uwaga]
@@ -13,6 +15,8 @@ export type Recipe = {
   type: MealType;
   minutes: number;
   category: string;
+  collection?: string;
+  equipment?: Equipment[];
   ingredients: Item[];
   spices?: string; // przyprawy bez wpływu na makro
   steps: string[];
@@ -32,6 +36,7 @@ const pasta = (g = 90): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopak
 const potato = (g = 250): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopaka: ${g} g gotowanych ziemniaków do tej samej porcji.`, extra: [["ziemniak", g]] });
 
 export const recipes: Recipe[] = [
+  ...polishRecipes,
   ...newRecipes,
   // ───────── ŚNIADANIA ─────────
   { id: "jajecznica-serek", name: "Jajecznica z serkiem śmietankowym", type: "sniadanie", minutes: 10, category: "Low-carb",

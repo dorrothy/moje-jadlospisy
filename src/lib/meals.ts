@@ -1,4 +1,5 @@
 import { ingredients, type IngredientId } from "@/data/ingredients";
+import { recipeEquipment, type Equipment } from '@/data/equipment';
 import { recipes, weeks, recipeById, type Item, type MealType, type Recipe } from "@/data/recipes";
 
 export type Macros = { kcal: number; p: number; f: number; c: number; missing: string[] };
@@ -50,14 +51,16 @@ export function weeksOfRecipe(id: string) {
   return weeks.filter((w) => w.days.some((d) => Object.values(d).includes(id))).map((w) => w.n);
 }
 
-export function searchRecipes(q: string, opts: { week?: number | undefined; type?: MealType | undefined; favs?: string[] | undefined } = {}) {
+export function searchRecipes(q: string, opts: { week?: number | undefined; type?: MealType | undefined; favs?: string[] | undefined; equipment?: Equipment; collection?: string } = {}) {
   const nq = normalize(q);
   return recipes.filter((r) => {
     if (opts.type && r.type !== opts.type) return false;
+    if (opts.equipment && !recipeEquipment(r).includes(opts.equipment)) return false;
+    if (opts.collection && r.collection !== opts.collection) return false;
     if (opts.week && !weeksOfRecipe(r.id).includes(opts.week)) return false;
     if (opts.favs && !opts.favs.includes(r.id)) return false;
     if (!nq) return true;
-    const hay = normalize([r.name, r.category, r.spices ?? "", ...r.ingredients.map(([id]) => ingredients[id].name)].join(" "));
+    const hay = normalize([r.name, r.category, r.collection ?? '', r.spices ?? "", ...r.ingredients.map(([id]) => ingredients[id].name)].join(" "));
     return nq.split(/\s+/).every((t) => hay.includes(t));
   });
 }
