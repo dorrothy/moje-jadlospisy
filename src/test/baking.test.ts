@@ -9,7 +9,7 @@ import { originalAssignments } from './original-weeks-fixture';
 
 const byId = (id: string) => { const r = recipeById[`wypieki-${id}`]; if (!r) throw new Error(`missing ${id}`); return r; };
 
-describe('28 nowych przepisów: ryby, owsianki, shake'i, ciasteczka, pieczywo', () => {
+describe("28 nowych przepisów: ryby, owsianki, shake'i, ciasteczka, pieczywo", () => {
   it('ma 28 unikalnych przepisów w 5 kolekcjach', () => {
     expect(bakingRecipes).toHaveLength(28);
     expect(new Set(recipes.map(r => r.id)).size).toBe(recipes.length);
