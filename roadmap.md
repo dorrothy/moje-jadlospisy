@@ -50,5 +50,6 @@ Zdjęcia: 105 testów przeszło. Chromium 390×844: galeria, 3200×2400 → JPEG
 - [x] Nazwa aplikacji „Let's cook" i edytowalny nagłówek na stronie głównej
 - [x] Wyrównanie przycisków „Duplikuj jako własny" i „Ocena i notatka" w jednej linii
 - [x] Składniki widoczne w trybie „Gotuję teraz" (oryginalne i własne przepisy)
-- [ ] Tryb „gotuję dla 2" — łączona lista składników: Twoja porcja + porcja chłopaka naraz (przepis, zakupy, tryb gotowania)
-- [ ] Usunąć napis „Ekran nie będzie gasnąć podczas gotowania" z trybu gotowania
+- [x] Tryb „gotuję dla 2" — łączona lista składników: Twoja porcja + porcja chłopaka naraz (strona przepisu i tryb gotowania)
+- [x] Usunąć napis „Ekran nie będzie gasnąć podczas gotowania" z trybu gotowania
+Wspólne gotowanie: przełącznik „Dla mnie / Dla chłopaka / Razem dla 2" na stronach przepisów (oryginalne i własne); dla dorsza 180 g → 230 g → 410 g, makro 525 → 757 → 1282 kcal. Lista zakupów tygodnia nadal liczy tylko Twoją porcję — do dodania osobno. 189 testów, tsgo bez błędów, Chromium 390×844 bez błędów strony.
