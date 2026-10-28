@@ -29,3 +29,4 @@
 - Makro partii i na 100 g liczone zawsze z tych samych składników przez `portionMacros(recipe, yield.count)`, nigdy wpisywane ręcznie.
 - Custom weeks carry an optional validated `leftovers` flag per day/slot; `customShopping` skips leftover slots so resztki są liczone raz, a stare kopie zapasowe bez tego pola pozostają zgodne.
 - Tryb gotowania (`CookingMode`) jest współdzielony przez strony przepisów oryginalnych i własnych; Wake Lock jest opcjonalny i przy braku API nie pokazuje wskaźnika.
+- Bundled recipes may carry optional free-text `tags` (searchable, shown as chips); recipes in the 'Sosy i dodatki' category are excluded from planner slot pools because they are add-ons, not meals.
