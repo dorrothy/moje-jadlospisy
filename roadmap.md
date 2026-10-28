@@ -1,4 +1,7 @@
 # Zadania
+- [ ] Dodać 20 przepisów „Polskie klasyki i zapiekanki” z osobnymi porcjami chłopaka
+- [ ] Dodać filtr sprzętu dla dotychczasowych i nowych przepisów
+- [ ] Sprawdzić gramatury, makro i pełną integrację bez zmiany obecnych danych
 - [x] Dodać 24 pełne przepisy z dokładnymi gramaturami i zachować oryginalne tygodnie
 - [x] Obliczenia z jawnej tabeli na 100 g i 12 oddzielnych porcji chłopaka
 - [x] Sprawdzić makro, gramatury, wyszukiwanie, ulubione, tygodnie i zakupy
