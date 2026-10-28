@@ -37,6 +37,7 @@ function ShoppingPage() {
   return (
     <main className="px-4 pt-6">
       <h1 className="text-3xl font-bold">Lista zakupów</h1>
+      <Link className="mt-3 block text-sm text-primary" to="/dodatkowe-zakupy">Dodatkowe zakupy z lodówki ({data.extraShopping?.length??0}) →</Link>
       <div className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1">
         {weeks.map((w) => (
           <Link key={w.n} to="/zakupy/$n" params={{ n: String(w.n) }}>

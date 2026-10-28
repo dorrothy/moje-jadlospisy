@@ -11,6 +11,7 @@ import { ingredients } from "@/data/ingredients";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
 import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatGrams, recipeItems } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
+import { RecipeReview, ReviewSummary } from '@/components/RecipeReview';
 
 export const Route = createFileRoute("/przepis/$id")({
   loader: ({ params }) => {
@@ -70,6 +71,7 @@ function OriginalRecipePage() {
       </div>
 
       <Button variant="outline" className="mt-3" onClick={() => setCopy(copyOriginal(recipe.id))}>Duplikuj jako własny</Button>
+      <RecipeReview id={recipe.id}/><ReviewSummary id={recipe.id}/>
       {copy && <RecipeEditor initial={copy} onClose={() => setCopy(undefined)} onSave={r => { if (update(d => ({...d, recipes:[...d.recipes,r]}))) setCopy(undefined); }} />}
       <header className="bg-hero mt-3 rounded-3xl p-5 shadow-soft">
         <div className="flex flex-wrap gap-2 text-xs font-medium">
