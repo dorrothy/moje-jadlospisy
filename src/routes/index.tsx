@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useLocalData } from "@/lib/local-data";
-import { newId } from "@/lib/custom-data";
+import { newId, weekBgClass, weekEmoji, type WeekColor } from "@/lib/custom-data";
 import { Pencil, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { weeks } from "@/data/recipes";
 import { weekBg } from "@/components/MealCard";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,7 +45,8 @@ function Index() {
     const existing = data.weeks.find((x) => x.name === name);
     if (existing) { void navigate({ to: "/moj-tydzien/$id", params: { id: existing.id } }); return; }
     const id = newId("week");
-    if (update((d) => ({ ...d, weeks: [...d.weeks, { id, name, days: w.days.map((day) => ({ ...day })) }] })))
+    const color = `week-${n}` as WeekColor;
+    if (update((d) => ({ ...d, weeks: [...d.weeks, { id, name, emoji: w.emoji, color, days: w.days.map((day) => ({ ...day })) }] })))
       navigate({ to: "/moj-tydzien/$id", params: { id } });
   };
   return (
@@ -73,11 +75,14 @@ function Index() {
           <h2 className="mt-6 text-xl">Moje tygodnie</h2>
           <div className="mt-3 grid grid-cols-2 gap-3">
             {data.weeks.map((w) => (
-              <Link key={w.id} to="/moj-tydzien/$id" params={{ id: w.id }} className="bg-card group flex min-h-32 flex-col justify-between rounded-3xl border p-4 shadow-soft transition-transform active:scale-[0.98]">
-                <h3 className="break-words text-lg font-bold leading-tight">{w.name}</h3>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{w.days.flatMap((d) => Object.values(d)).filter(Boolean).length}/28 posiłków</span>
-                  <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <Link key={w.id} to="/moj-tydzien/$id" params={{ id: w.id }} className={`${weekBgClass(w)} group flex aspect-[4/5] flex-col justify-between rounded-3xl p-4 shadow-soft transition-transform active:scale-[0.98]`}>
+                <span className="text-4xl">{weekEmoji(w)}</span>
+                <div>
+                  <h3 className="break-words text-lg font-bold leading-tight">{w.name}</h3>
+                  <div className="mt-1 flex items-center justify-between text-xs text-foreground/70">
+                    <span>{w.days.flatMap((d) => Object.values(d)).filter(Boolean).length}/28 posiłków</span>
+                    <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </div>
                 </div>
               </Link>
             ))}
