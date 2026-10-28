@@ -26,10 +26,11 @@ export const newId = (kind: 'own' | 'week') => `${kind}-${crypto.randomUUID()}`;
 export function blankWeek(name: string): CustomWeek { return { id:newId('week'), name, days:Array.from({length:7}, () => ({sniadanie:null,obiad:null,deser:null,kolacja:null})) }; }
 export function deleteRecipe(data: LocalData, id: string): LocalData { const reviews={...data.reviews};delete reviews[id];return {...data,...(data.reviews?{reviews}:{}), recipes:data.recipes.filter(r => r.id !== id), weeks:data.weeks.map(w => ({...w,days:w.days.map(d => Object.fromEntries(Object.entries(d).map(([slot,rid]) => [slot, rid === id ? null : rid])) as CustomWeek['days'][number])}))}; }
 export function parseImport(text: string): LocalData { return dataSchema.parse(JSON.parse(text)); }
-export function mergeImport(current: LocalData, incoming: LocalData): LocalData {
+export function mergeImport(current: LocalData, incoming: LocalData, recipeRemap?: Map<string,string>): LocalData {
   // Import is additive: remap colliding IDs, including every week assignment.
   const ids = new Set(current.recipes.map(r=>r.id)); const remap = new Map<string,string>();
   const added = incoming.recipes.map(r => { const id=ids.has(r.id)?newId('own'):r.id; ids.add(id); remap.set(r.id,id); return {...r,id}; });
+  for(const [oldId,id] of remap)recipeRemap?.set(oldId,id);
   const weekIds = new Set(current.weeks.map(w=>w.id));
   const reviews={...current.reviews};for(const [rid,review] of Object.entries(incoming.reviews??{})){const id=remap.get(rid)??rid;const old=reviews[id];reviews[id]=old?{...old,note:old.note===review.note?old.note:[old.note,review.note&&`Import: ${review.note}`].filter(Boolean).join('\n'),cooked:old.cooked||review.cooked,...(!old.rating&&review.rating?{rating:review.rating}:{})}:review;}
   return {...current,...(current.reviews||incoming.reviews?{reviews}:{}),...(incoming.pantry?{pantry:[...(current.pantry??[]),...incoming.pantry]}:{}),...(incoming.extraShopping?{extraShopping:[...(current.extraShopping??[]),...incoming.extraShopping]}:{}), recipes:[...current.recipes,...added], weeks:[...current.weeks,...incoming.weeks.map(w=>{ const id=weekIds.has(w.id)?newId('week'):w.id; weekIds.add(id); return {...w,id,days:w.days.map(d=>Object.fromEntries(Object.entries(d).map(([s,r])=>[s,r ? remap.get(r) ?? r : null])) as CustomWeek['days'][number])}; })]};
