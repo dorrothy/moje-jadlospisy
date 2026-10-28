@@ -28,7 +28,7 @@ function Index() {
     const w = weeks.find((x) => x.n === n)!;
     const name = `${w.title} (moja wersja)`;
     const existing = data.weeks.find((x) => x.name === name);
-    if (existing) return navigate({ to: "/moj-tydzien/$id", params: { id: existing.id } });
+    if (existing) { void navigate({ to: "/moj-tydzien/$id", params: { id: existing.id } }); return; }
     const id = newId("week");
     if (update((d) => ({ ...d, weeks: [...d.weeks, { id, name, days: w.days.map((day) => ({ ...day })) }] })))
       navigate({ to: "/moj-tydzien/$id", params: { id } });
