@@ -79,8 +79,11 @@ function OriginalRecipePage() {
         </button>
       </div>
 
-      <Button variant="outline" className="mt-3" onClick={() => setCopy(copyOriginal(recipe.id,protein))}>Duplikuj jako własny</Button>
-      <RecipeReview id={recipe.id}/><ReviewSummary id={recipe.id}/>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Button variant="outline" onClick={() => setCopy(copyOriginal(recipe.id,protein))}>Duplikuj jako własny</Button>
+        <RecipeReview id={recipe.id}/>
+      </div>
+      <ReviewSummary id={recipe.id}/>
       {copy && <RecipeEditor initial={copy} onClose={() => setCopy(undefined)} onSave={r => { if (update(d => ({...d, recipes:[...d.recipes,r]}))) setCopy(undefined); }} />}
       <header className="bg-hero mt-3 rounded-3xl p-5 shadow-soft">
         <div className="flex flex-wrap gap-2 text-xs font-medium">
