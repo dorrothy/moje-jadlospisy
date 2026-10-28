@@ -16,7 +16,7 @@ export const Route = createFileRoute("/zakupy/$n")({
     meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { title: `Lista zakupów — tydzień ${loaderData?.week.n ?? ""} — Moje przepisy` },
+      { title: `Lista zakupów — tydzień ${loaderData?.week.n ?? ""} — Let's cook` },
       { name: "description", content: "Lista zakupów na cały tydzień z odhaczaniem i licznikiem porcji." },
       { property: "og:title", content: "Lista zakupów na tydzień" },
       { property: "og:description", content: "Wszystkie składniki tygodnia w jednym miejscu." },

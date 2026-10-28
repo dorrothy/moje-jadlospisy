@@ -18,7 +18,7 @@ export const Route = createFileRoute("/tydzien/$n")({
       meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-        { title: `${t} — Moje przepisy` },
+        { title: `${t} — Let's cook` },
         { name: "description", content: loaderData ? `${loaderData.week.subtitle}. 7 dni, 4 posiłki dziennie.` : "Plan tygodnia" },
         { property: "og:title", content: t },
         { property: "og:description", content: "7 dni, 4 posiłki dziennie z przepisami." },

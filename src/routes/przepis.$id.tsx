@@ -26,7 +26,7 @@ export const Route = createFileRoute("/przepis/$id")({
       meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-        { title: `${n} — Moje przepisy` },
+        { title: `${n} — Let's cook` },
         { name: "description", content: `Przepis: ${n}. Gramatury na porcję, kroki i szacunkowe makro.` },
         { property: "og:title", content: n },
         { property: "og:description", content: "Gramatury na porcję, instrukcja krok po kroku, kcal i makro." },

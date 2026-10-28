@@ -6,7 +6,7 @@ export const Route = createFileRoute("/ulubione")({
     meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { title: "Ulubione przepisy — Moje przepisy" },
+      { title: "Ulubione przepisy — Let's cook" },
       { name: "description", content: "Twoje ulubione przepisy zapisane na tym urządzeniu." },
       { property: "og:title", content: "Ulubione przepisy" },
       { property: "og:description", content: "Ulubione przepisy z planu 4 tygodni." },
