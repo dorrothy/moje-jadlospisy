@@ -51,3 +51,4 @@ Zdjęcia: 105 testów przeszło. Chromium 390×844: galeria, 3200×2400 → JPEG
 - [x] Wyrównanie przycisków „Duplikuj jako własny" i „Ocena i notatka" w jednej linii
 - [x] Składniki widoczne w trybie „Gotuję teraz" (oryginalne i własne przepisy)
 - [ ] Tryb „gotuję dla 2" — łączona lista składników: Twoja porcja + porcja chłopaka naraz (przepis, zakupy, tryb gotowania)
+- [ ] Usunąć napis „Ekran nie będzie gasnąć podczas gotowania" z trybu gotowania

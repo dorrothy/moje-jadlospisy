@@ -37,7 +37,6 @@ export function CookingMode({ name, steps, ingredients, note, onClose }: {
         <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{finished}/{steps.length}</span>
         <Button size="icon" variant="ghost" aria-label="Zakończ gotowanie" onClick={onClose}><X className="h-5 w-5" /></Button>
       </header>
-      {wakeLock === 'on' && <p className="bg-secondary px-4 py-1.5 text-center text-xs text-muted-foreground">Ekran nie będzie gasnąć podczas gotowania</p>}
       {items.length > 0 && (
         <button
           onClick={() => setShowItems(v => !v)}
