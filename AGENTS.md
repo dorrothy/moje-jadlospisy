@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep bundled recipes/weeks immutable; user data lives in a versioned, validated local overlay provided at the root, because the app must work without a backend.
+- Store custom ingredient quantities per whole recipe and manual macros per serving; normalize only compatible shopping units to avoid guessing density or piece weights.
+- Import local JSON additively and remap colliding IDs plus assignments so existing data is never overwritten.

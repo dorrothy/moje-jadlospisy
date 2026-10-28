@@ -1,0 +1,16 @@
+import { describe,it,expect } from 'vitest';
+import { blankWeek,customShopping,deleteRecipe,parseImport,mergeImport,matchesCustom,emptyData,type CustomRecipe } from '@/lib/custom-data';
+import { mealSlots } from '@/data/recipes';
+const r:CustomRecipe={id:'own-test',name:'Łosoś domowy',category:'Własne',type:'obiad',minutes:10,servings:2,ingredients:[{name:'Cukier',amount:200,unit:'g'},{name:'cukier',amount:0.1,unit:'kg'},{name:'Mleko',amount:100,unit:'ml'}],steps:['Gotuj'],macros:{kcal:123,p:12,f:3,c:4}};
+function at<T>(items:T[], index=0):T { const item=items[index]; if(item===undefined) throw new Error('Missing test item'); return item; }
+describe('local recipes and weeks',()=>{
+ it('makes seven days and four exact meal times',()=>{expect(blankWeek('Test').days).toHaveLength(7);expect(Object.keys(at(blankWeek('Test').days))).toHaveLength(4);expect(mealSlots.map(s=>s.time)).toEqual(['10:00','13:00','16:00','18:00']);});
+ it('does not limit the number of weeks',()=>{expect(parseImport(JSON.stringify({...emptyData,weeks:Array.from({length:100},(_,i)=>({...blankWeek(`T${i}`),id:`week-${i}`}))})).weeks).toHaveLength(100);});
+ it('aggregates grams and kilograms, scaling recipe portions',()=>{const w=blankWeek('Test');at(w.days).obiad=r.id;at(w.days,1).obiad=r.id;expect(customShopping(w,[r]).find(x=>x.unit==='g')?.amount).toBe(300);expect(customShopping(w,[r],2).find(x=>x.unit==='g')?.amount).toBe(600);});
+ it('keeps unlike units separate rather than inventing weights',()=>{const w=blankWeek('Test');at(w.days).obiad=r.id;const x={...r,ingredients:[{name:'Mleko',amount:100,unit:'g' as const},{name:'Mleko',amount:100,unit:'ml' as const}]};expect(customShopping(w,[x])).toHaveLength(2);});
+ it('removes deleted recipe assignments without removing weeks',()=>{const w=blankWeek('Test');at(w.days).obiad=r.id;const next=deleteRecipe({...emptyData,recipes:[r],weeks:[w]},r.id);expect(next.recipes).toHaveLength(0);expect(next.weeks).toHaveLength(1);expect(at(at(next.weeks).days).obiad).toBeNull();});
+ it('roundtrips all own data and preserves manually entered macros',()=>{const w=blankWeek('Test');at(w.days).obiad=r.id;const d={...emptyData,recipes:[r],weeks:[w]};expect(parseImport(JSON.stringify(d))).toEqual(d);expect(at(parseImport(JSON.stringify(d)).recipes).macros.kcal).toBe(123);});
+ it('imports additively and remaps conflicting assignments',()=>{const w=blankWeek('Test');at(w.days).obiad=r.id;const d={...emptyData,recipes:[r],weeks:[w]};const next=mergeImport(d,d);expect(next.recipes).toHaveLength(2);expect(next.weeks).toHaveLength(2);expect(at(next.recipes,1).id).not.toBe(r.id);expect(at(at(next.weeks,1).days).obiad).toBe(at(next.recipes,1).id);});
+ it('rejects broken imports without changing existing data',()=>{expect(()=>parseImport('{bad')).toThrow();expect(()=>parseImport(JSON.stringify({...emptyData,recipes:[{...r,servings:0}]}))).toThrow();const w=blankWeek('x');at(w.days).obiad='missing';expect(()=>parseImport(JSON.stringify({...emptyData,weeks:[w]}))).toThrow();});
+ it('searches own recipes without Polish accents',()=>{expect(matchesCustom(r,'losos')).toBe(true);expect(matchesCustom(r,'cukier')).toBe(true);expect(matchesCustom(r,'kurczak')).toBe(false);});
+});

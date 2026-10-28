@@ -11,6 +11,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { CalendarDays, Search, ShoppingBasket, Heart } from "lucide-react";
 
+import { LocalDataProvider } from "@/lib/local-data";
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { setupServiceWorker } from "../lib/pwa";
@@ -64,8 +66,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-      { name: "apple-mobile-web-app-title", content: "4 tygodnie" },
-      { title: "Moje 4 tygodnie" },
+      { name: "apple-mobile-web-app-title", content: "Moje przepisy" },
+      { title: "Moje przepisy" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -117,6 +119,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <LocalDataProvider>
       <div className="safe-top mx-auto min-h-screen max-w-2xl pb-28">
         <Outlet />
       </div>
@@ -135,6 +138,8 @@ function RootComponent() {
           ))}
         </div>
       </nav>
+    <Toaster />
+      </LocalDataProvider>
     </QueryClientProvider>
   );
 }

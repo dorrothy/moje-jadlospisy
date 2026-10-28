@@ -86,7 +86,7 @@
   }
   h1, h2, h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 }
 
@@ -102,3 +102,5 @@
 @utility safe-top {
   padding-top: env(safe-area-inset-top);
 }
+
+@layer base { input, select, textarea { font-size: 16px; } }

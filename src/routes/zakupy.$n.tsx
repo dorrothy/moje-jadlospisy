@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Check, Minus, Plus, RotateCcw } from "lucide-react";
+import { useLocalData } from "@/lib/local-data";
 import { weeks } from "@/data/recipes";
 import { shoppingList, formatGrams } from "@/lib/meals";
 import { useStored } from "@/lib/storage";
@@ -13,7 +14,9 @@ export const Route = createFileRoute("/zakupy/$n")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `Lista zakupów — tydzień ${loaderData?.week.n ?? ""} — Moje 4 tygodnie` },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: `Lista zakupów — tydzień ${loaderData?.week.n ?? ""} — Moje przepisy` },
       { name: "description", content: "Lista zakupów na cały tydzień z odhaczaniem i licznikiem porcji." },
       { property: "og:title", content: "Lista zakupów na tydzień" },
       { property: "og:description", content: "Wszystkie składniki tygodnia w jednym miejscu." },
@@ -23,6 +26,7 @@ export const Route = createFileRoute("/zakupy/$n")({
 });
 
 function ShoppingPage() {
+  const { data } = useLocalData();
   const { week } = Route.useLoaderData();
   const [servings, setServings] = useStored<number>(`servings-${week.n}`, 1);
   const [checked, setChecked] = useStored<string[]>(`shop-${week.n}`, []);
@@ -40,6 +44,7 @@ function ShoppingPage() {
           </Link>
         ))}
       </div>
+      <div className="mt-3 flex flex-wrap gap-2">{data.weeks.map(w => <Link className="rounded-lg border bg-card px-3 py-2 text-sm" key={w.id} to="/moje-zakupy/$id" params={{id:w.id}}>{w.name}</Link>)}<Link className="px-3 py-2 text-sm text-primary" to="/moje-tygodnie">Moje tygodnie</Link></div>
       <p className="mt-3 text-sm text-muted-foreground">{week.title} · 7 dni × 4 posiłki</p>
 
       <div className="mt-4 flex items-center justify-between rounded-2xl bg-card p-3 shadow-soft">

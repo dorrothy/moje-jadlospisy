@@ -1,5 +1,10 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
+import { OwnRecipePage } from "@/components/OwnRecipePage";
+import { RecipeEditor } from "@/components/RecipeEditor";
+import { Button } from "@/components/ui/button";
+import { useLocalData } from "@/lib/local-data";
+import { copyOriginal, type CustomRecipe } from "@/lib/custom-data";
 import { useState } from "react";
 import { recipeById } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
@@ -9,14 +14,16 @@ import { useFavorites } from "@/lib/storage";
 export const Route = createFileRoute("/przepis/$id")({
   loader: ({ params }) => {
     const recipe = recipeById[params.id];
-    if (!recipe) throw notFound();
+    if (!recipe && !params.id.startsWith("own-")) throw notFound();
     return { recipe };
   },
   head: ({ loaderData }) => {
-    const n = loaderData?.recipe.name ?? "Przepis";
+    const n = loaderData?.recipe?.name ?? "Przepis";
     return {
       meta: [
-        { title: `${n} — Moje 4 tygodnie` },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+        { title: `${n} — Moje przepisy` },
         { name: "description", content: `Przepis: ${n}. Gramatury na porcję, kroki i szacunkowe makro.` },
         { property: "og:title", content: n },
         { property: "og:description", content: "Gramatury na porcję, instrukcja krok po kroku, kcal i makro." },
@@ -27,11 +34,24 @@ export const Route = createFileRoute("/przepis/$id")({
 });
 
 function RecipePage() {
+  const { id } = Route.useParams();
+  const { data, ready } = useLocalData();
+  const own = data.recipes.find(r => r.id === id);
+  if (id.startsWith("own-")) {
+    if (!ready) return <main className="p-4">Wczytywanie…</main>;
+    return own ? <OwnRecipePage key={id} recipe={own} /> : <main className="p-4">Nie znaleziono przepisu. <Link to="/szukaj">Przepisy</Link></main>;
+  }
+  return <OriginalRecipePage />;
+}
+function OriginalRecipePage() {
   const { recipe } = Route.useLoaderData();
+  const { update } = useLocalData();
+  const [copy, setCopy] = useState<CustomRecipe | undefined>();
   const router = useRouter();
   const { isFav, toggle } = useFavorites();
   const [servings, setServings] = useState(1);
   const [forHim, setForHim] = useState(false);
+  if (!recipe) return null;
   const m = computeMacros(recipe.ingredients);
   const partnerM = recipe.partner ? computeMacros([...recipe.ingredients, ...recipe.partner.extra]) : null;
   const shown = forHim && partnerM ? partnerM : m;
@@ -48,6 +68,8 @@ function RecipePage() {
         </button>
       </div>
 
+      <Button variant="outline" className="mt-3" onClick={() => setCopy(copyOriginal(recipe.id))}>Duplikuj jako własny</Button>
+      {copy && <RecipeEditor initial={copy} onClose={() => setCopy(undefined)} onSave={r => { if (update(d => ({...d, recipes:[...d.recipes,r]}))) setCopy(undefined); }} />}
       <header className="bg-hero mt-3 rounded-3xl p-5 shadow-soft">
         <div className="flex flex-wrap gap-2 text-xs font-medium">
           <span className="rounded-full bg-card px-2.5 py-1">{typeLabel[recipe.type]}</span>

@@ -10,8 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DaneRouteImport } from './routes/dane'
+import { Route as MojeTygodnieRouteImport } from './routes/moje-tygodnie'
 import { Route as SzukajRouteImport } from './routes/szukaj'
 import { Route as UlubioneRouteImport } from './routes/ulubione'
+import { Route as MojTydzienIdRouteImport } from './routes/moj-tydzien.$id'
+import { Route as MojeZakupyIdRouteImport } from './routes/moje-zakupy.$id'
 import { Route as PrzepisIdRouteImport } from './routes/przepis.$id'
 import { Route as TydzienNRouteImport } from './routes/tydzien.$n'
 import { Route as ZakupyIndexRouteImport } from './routes/zakupy.index'
@@ -22,6 +26,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DaneRoute = DaneRouteImport.update({
+  id: '/dane',
+  path: '/dane',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MojeTygodnieRoute = MojeTygodnieRouteImport.update({
+  id: '/moje-tygodnie',
+  path: '/moje-tygodnie',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SzukajRoute = SzukajRouteImport.update({
   id: '/szukaj',
   path: '/szukaj',
@@ -30,6 +44,16 @@ const SzukajRoute = SzukajRouteImport.update({
 const UlubioneRoute = UlubioneRouteImport.update({
   id: '/ulubione',
   path: '/ulubione',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MojTydzienIdRoute = MojTydzienIdRouteImport.update({
+  id: '/moj-tydzien/$id',
+  path: '/moj-tydzien/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MojeZakupyIdRoute = MojeZakupyIdRouteImport.update({
+  id: '/moje-zakupy/$id',
+  path: '/moje-zakupy/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrzepisIdRoute = PrzepisIdRouteImport.update({
@@ -55,8 +79,12 @@ const ZakupyNRoute = ZakupyNRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dane': typeof DaneRoute
+  '/moje-tygodnie': typeof MojeTygodnieRoute
   '/szukaj': typeof SzukajRoute
   '/ulubione': typeof UlubioneRoute
+  '/moj-tydzien/$id': typeof MojTydzienIdRoute
+  '/moje-zakupy/$id': typeof MojeZakupyIdRoute
   '/przepis/$id': typeof PrzepisIdRoute
   '/tydzien/$n': typeof TydzienNRoute
   '/zakupy/$n': typeof ZakupyNRoute
@@ -64,8 +92,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dane': typeof DaneRoute
+  '/moje-tygodnie': typeof MojeTygodnieRoute
   '/szukaj': typeof SzukajRoute
   '/ulubione': typeof UlubioneRoute
+  '/moj-tydzien/$id': typeof MojTydzienIdRoute
+  '/moje-zakupy/$id': typeof MojeZakupyIdRoute
   '/przepis/$id': typeof PrzepisIdRoute
   '/tydzien/$n': typeof TydzienNRoute
   '/zakupy/$n': typeof ZakupyNRoute
@@ -74,8 +106,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dane': typeof DaneRoute
+  '/moje-tygodnie': typeof MojeTygodnieRoute
   '/szukaj': typeof SzukajRoute
   '/ulubione': typeof UlubioneRoute
+  '/moj-tydzien/$id': typeof MojTydzienIdRoute
+  '/moje-zakupy/$id': typeof MojeZakupyIdRoute
   '/przepis/$id': typeof PrzepisIdRoute
   '/tydzien/$n': typeof TydzienNRoute
   '/zakupy/$n': typeof ZakupyNRoute
@@ -85,8 +121,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dane'
+    | '/moje-tygodnie'
     | '/szukaj'
     | '/ulubione'
+    | '/moj-tydzien/$id'
+    | '/moje-zakupy/$id'
     | '/przepis/$id'
     | '/tydzien/$n'
     | '/zakupy/$n'
@@ -94,8 +134,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dane'
+    | '/moje-tygodnie'
     | '/szukaj'
     | '/ulubione'
+    | '/moj-tydzien/$id'
+    | '/moje-zakupy/$id'
     | '/przepis/$id'
     | '/tydzien/$n'
     | '/zakupy/$n'
@@ -103,8 +147,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dane'
+    | '/moje-tygodnie'
     | '/szukaj'
     | '/ulubione'
+    | '/moj-tydzien/$id'
+    | '/moje-zakupy/$id'
     | '/przepis/$id'
     | '/tydzien/$n'
     | '/zakupy/$n'
@@ -113,8 +161,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DaneRoute: typeof DaneRoute
+  MojeTygodnieRoute: typeof MojeTygodnieRoute
   SzukajRoute: typeof SzukajRoute
   UlubioneRoute: typeof UlubioneRoute
+  MojTydzienIdRoute: typeof MojTydzienIdRoute
+  MojeZakupyIdRoute: typeof MojeZakupyIdRoute
   PrzepisIdRoute: typeof PrzepisIdRoute
   TydzienNRoute: typeof TydzienNRoute
   ZakupyNRoute: typeof ZakupyNRoute
@@ -130,6 +182,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dane': {
+      id: '/dane'
+      path: '/dane'
+      fullPath: '/dane'
+      preLoaderRoute: typeof DaneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moje-tygodnie': {
+      id: '/moje-tygodnie'
+      path: '/moje-tygodnie'
+      fullPath: '/moje-tygodnie'
+      preLoaderRoute: typeof MojeTygodnieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/szukaj': {
       id: '/szukaj'
       path: '/szukaj'
@@ -142,6 +208,20 @@ declare module '@tanstack/react-router' {
       path: '/ulubione'
       fullPath: '/ulubione'
       preLoaderRoute: typeof UlubioneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moj-tydzien/$id': {
+      id: '/moj-tydzien/$id'
+      path: '/moj-tydzien/$id'
+      fullPath: '/moj-tydzien/$id'
+      preLoaderRoute: typeof MojTydzienIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moje-zakupy/$id': {
+      id: '/moje-zakupy/$id'
+      path: '/moje-zakupy/$id'
+      fullPath: '/moje-zakupy/$id'
+      preLoaderRoute: typeof MojeZakupyIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/przepis/$id': {
@@ -177,8 +257,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DaneRoute: DaneRoute,
+  MojeTygodnieRoute: MojeTygodnieRoute,
   SzukajRoute: SzukajRoute,
   UlubioneRoute: UlubioneRoute,
+  MojTydzienIdRoute: MojTydzienIdRoute,
+  MojeZakupyIdRoute: MojeZakupyIdRoute,
   PrzepisIdRoute: PrzepisIdRoute,
   TydzienNRoute: TydzienNRoute,
   ZakupyNRoute: ZakupyNRoute,

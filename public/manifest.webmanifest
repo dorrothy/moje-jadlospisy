@@ -1,7 +1,7 @@
 {
-  "name": "Moje 4 tygodnie",
-  "short_name": "4 tygodnie",
-  "description": "Jadłospis na 4 tygodnie z przepisami i listą zakupów",
+  "name": "Moje przepisy",
+  "short_name": "Moje przepisy",
+  "description": "Własne przepisy, tygodnie posiłków i lista zakupów",
   "lang": "pl",
   "start_url": "./",
   "scope": "./",

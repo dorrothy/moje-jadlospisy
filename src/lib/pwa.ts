@@ -20,7 +20,7 @@ export async function setupServiceWorker() {
   const swUrl = `${import.meta.env.BASE_URL}sw.js`;
   if (refused()) {
     const regs = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(regs.filter((r) => r.active?.scriptURL.endsWith("/sw.js")).map((r) => r.unregister()));
+    await Promise.all(regs.filter((r) => [r.active, r.waiting, r.installing].some(w => w?.scriptURL === new URL(swUrl, window.location.origin).href)).map((r) => r.unregister()));
     return;
   }
   navigator.serviceWorker.register(swUrl, { scope: import.meta.env.BASE_URL }).catch(() => {});

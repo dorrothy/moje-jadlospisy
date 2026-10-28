@@ -16,7 +16,9 @@ export const Route = createFileRoute("/tydzien/$n")({
     const t = loaderData ? `Tydzień ${loaderData.week.n}: ${loaderData.week.title}` : "Tydzień";
     return {
       meta: [
-        { title: `${t} — Moje 4 tygodnie` },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+        { title: `${t} — Moje przepisy` },
         { name: "description", content: loaderData ? `${loaderData.week.subtitle}. 7 dni, 4 posiłki dziennie.` : "Plan tygodnia" },
         { property: "og:title", content: t },
         { property: "og:description", content: "7 dni, 4 posiłki dziennie z przepisami." },
@@ -29,10 +31,13 @@ export const Route = createFileRoute("/tydzien/$n")({
 function WeekPage() {
   const { week } = Route.useLoaderData();
   const { dzien = 0 } = Route.useSearch();
-  const day = week.days[dzien] ?? week.days[0]!;
+  const day = week.days[dzien] ?? week.days[0];
+  if (!day) return null;
   const total = mealSlots.reduce(
     (acc, s) => {
-      const m = computeMacros(recipeById[day[s.type]]!.ingredients);
+      const recipe = recipeById[day[s.type]];
+      if (!recipe) return acc;
+      const m = computeMacros(recipe.ingredients);
       return { kcal: acc.kcal + m.kcal, p: acc.p + m.p, miss: acc.miss || m.missing.length > 0 };
     },
     { kcal: 0, p: 0, miss: false },
@@ -79,9 +84,7 @@ function WeekPage() {
           </p>
         </div>
         <div className="mt-3 space-y-3">
-          {mealSlots.map((s) => (
-            <MealCard key={s.type} recipe={recipeById[day[s.type]]!} time={s.time} label={s.label} />
-          ))}
+          {mealSlots.map((s) => { const recipe = recipeById[day[s.type]]; return recipe ? <MealCard key={s.type} recipe={recipe} time={s.time} label={s.label} /> : null; })}
         </div>
       </section>
     </main>
