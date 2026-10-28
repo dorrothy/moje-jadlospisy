@@ -146,9 +146,9 @@ function OriginalRecipePage() {
         {!forHim && (
           <div className="mt-2 flex items-center gap-2">
             <label className="flex-1 text-sm text-muted-foreground">Przelicz na kalorie
-              <input aria-label="Docelowa kaloryczność" type="number" inputMode="numeric" min={1} placeholder={`np. ${Math.max(50, Math.round(m.kcal / 2))}`} value={kcalTarget} onChange={(e) => setKcalTarget(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-3" />
+              <input aria-label="Docelowa kaloryczność" type="number" inputMode="numeric" min={1} placeholder={`np. ${Math.max(50, Math.round(baseKcal / 2))}`} value={kcalTarget} onChange={(e) => setKcalTarget(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-3" />
             </label>
-            <Button variant="outline" size="sm" className="mt-5" disabled={!kcalTarget || Number(kcalTarget) <= 0 || m.kcal === 0} onClick={() => setServings(Math.min(20, Math.max(.75, Math.round((Number(kcalTarget) / m.kcal) * 4) / 4)))}>Ustaw</Button>
+            <Button variant="outline" size="sm" className="mt-5" disabled={!kcalTarget || Number(kcalTarget) <= 0 || baseKcal === 0} onClick={() => setServings(Math.min(20, Math.max(.75, Math.round((Number(kcalTarget) / baseKcal) * 4) / 4)))}>Ustaw</Button>
           </div>
         )}
         <div className="mt-3 overflow-hidden rounded-2xl border bg-card">
