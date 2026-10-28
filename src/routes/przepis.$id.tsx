@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { ChefHat, ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
 import { CookingMode } from "@/components/CookingMode";
+import { originalCookingItems } from "@/lib/cooking";
 import { OwnRecipePage } from "@/components/OwnRecipePage";
 import { RecipeEditor } from "@/components/RecipeEditor";
 import { Button } from "@/components/ui/button";
@@ -197,7 +198,15 @@ function OriginalRecipePage() {
           ))}
         </ol>
       </section>
-      {cooking && <CookingMode name={recipe.name} steps={recipe.steps} onClose={() => setCooking(false)} />}
+      {cooking && (
+        <CookingMode
+          name={recipe.name}
+          steps={recipe.steps}
+          ingredients={originalCookingItems(recipe, forHim, protein, servings)}
+          note={recipe.spices ? `Przyprawy: ${recipe.spices}` : undefined}
+          onClose={() => setCooking(false)}
+        />
+      )}
     </main>
   );
 }
