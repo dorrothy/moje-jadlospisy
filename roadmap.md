@@ -1,4 +1,8 @@
 # Zadania
+- [ ] Lodówka: składniki, ostrożne dopasowanie ilości, brakujące zakupy
+- [ ] Generator tygodnia: cele, preferencje, zamiany i zapis własnego tygodnia
+- [ ] Oceny, notatki, data gotowania, filtry i eksport/import lokalnych danych
+- [ ] Testy reguł i pełnych interakcji trzech funkcji
 - [x] Dodać 20 przepisów „Polskie klasyki i zapiekanki” z osobnymi porcjami chłopaka
 - [x] Dodać filtr sprzętu dla dotychczasowych i nowych przepisów
 - [x] Sprawdzić gramatury, makro i pełną integrację bez zmiany obecnych danych
