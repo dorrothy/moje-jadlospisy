@@ -60,7 +60,7 @@ export function WeekStyleDialog({ open, initial, onSave, onCancel }: {
                   onClick={() => setColor(c)}
                   className={cn(
                     "h-10 w-10 rounded-full border-2 shadow-soft transition-transform",
-                    weekBgClass({ color: c }),
+                    weekColorClass(c),
                     color === c ? "scale-110 border-primary" : "border-transparent",
                   )}
                 />
