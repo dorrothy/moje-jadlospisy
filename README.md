@@ -1,29 +1,19 @@
-# Welcome to your Lovable project
+# Moje 4 tygodnie
 
-This project was built with [Lovable](https://lovable.dev).
+Jadłospis na 4 tygodnie (PWA, po polsku). Bez bazy i logowania — ulubione, lista zakupów i liczba porcji zapisują się w localStorage.
 
-## Build with Lovable
+## Edycja danych
+- `src/data/recipes.ts` — przepisy (gramatury na 1 porcję), plan tygodni, wersje dla chłopaka.
+- `src/data/ingredients.ts` — tabela składników: kcal/B/T/W na 100 g. `null` = „do uzupełnienia”.
+Makro liczy się automatycznie i jest oznaczone jako szacunkowe.
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+## Deploy na GitHub Pages
+1. Wypchnij repo na GitHub (gałąź `main`).
+2. Settings → Pages → Source: **GitHub Actions**.
+3. Workflow `.github/workflows/deploy.yml` buduje statyczny SPA z `BASE_PATH=/<nazwa-repo>/` i publikuje `dist/client` (z `404.html` dla głębokich linków).
+Własna domena / repo `user.github.io`: ustaw `BASE_PATH=/`.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+Lokalnie: `GITHUB_PAGES=1 BASE_PATH=/moje-4-tygodnie/ bun run build`.
 
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+## iPhone
+Otwórz stronę w Safari → Udostępnij → „Do ekranu początkowego”. Tryb offline działa po pierwszym otwarciu opublikowanej wersji (nie w podglądzie edytora).

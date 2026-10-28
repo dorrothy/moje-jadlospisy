@@ -32,7 +32,7 @@ function WeekPage() {
   const day = week.days[dzien] ?? week.days[0]!;
   const total = mealSlots.reduce(
     (acc, s) => {
-      const m = computeMacros(recipeById[day[s.type]].ingredients);
+      const m = computeMacros(recipeById[day[s.type]]!.ingredients);
       return { kcal: acc.kcal + m.kcal, p: acc.p + m.p, miss: acc.miss || m.missing.length > 0 };
     },
     { kcal: 0, p: 0, miss: false },
@@ -80,7 +80,7 @@ function WeekPage() {
         </div>
         <div className="mt-3 space-y-3">
           {mealSlots.map((s) => (
-            <MealCard key={s.type} recipe={recipeById[day[s.type]]} time={s.time} label={s.label} />
+            <MealCard key={s.type} recipe={recipeById[day[s.type]]!} time={s.time} label={s.label} />
           ))}
         </div>
       </section>

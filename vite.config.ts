@@ -9,8 +9,8 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // GitHub Pages: GITHUB_PAGES=1 BASE_PATH=/nazwa-repo/ bun run build
 // → statyczny SPA w dist/client (bez serwera).
-const pages = process.env.GITHUB_PAGES === "1";
-const base = process.env.BASE_PATH || "/";
+const pages = process.env["GITHUB_PAGES"] === "1";
+const base = process.env["BASE_PATH"] || "/";
 
 export default defineConfig({
   tanstackStart: pages

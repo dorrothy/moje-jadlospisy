@@ -14,7 +14,7 @@ describe("meals", () => {
     expect(computeMacros([["jajko", 180]]).kcal).toBe(257);
   });
   it("flags ingredients without data as missing", () => {
-    expect(computeMacros(recipeById["curry-kokosowe"].ingredients).missing).toContain("Pasta curry");
+    expect(computeMacros(recipeById["curry-kokosowe"]!.ingredients).missing).toContain("Pasta curry");
   });
   it("searches without Polish characters", () => {
     expect(normalize("Łosoś żółty")).toBe("losos zolty");
