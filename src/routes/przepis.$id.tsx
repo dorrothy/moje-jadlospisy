@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
-import { ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
+import { ChefHat, ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
+import { CookingMode } from "@/components/CookingMode";
 import { OwnRecipePage } from "@/components/OwnRecipePage";
 import { RecipeEditor } from "@/components/RecipeEditor";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ function OriginalRecipePage() {
   const { porcje = 1 } = Route.useSearch();
   const [servings, setServings] = useState(porcje);
   const [forHim, setForHim] = useState(false);
+  const [cooking, setCooking] = useState(false);
   const [protein, setProtein] = useState(false);
   if (!recipe) return null;
   const m = computeMacros(recipeItems(recipe,false,protein).map(([id,g])=>[id,g*servings]));
@@ -169,7 +171,10 @@ function OriginalRecipePage() {
       </section>
 
       <section className="mt-6">
-        <h2 className="text-xl font-bold">Przygotowanie</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-xl font-bold">Przygotowanie</h2>
+          <Button variant="outline" size="sm" onClick={() => setCooking(true)}><ChefHat className="h-4 w-4" />Gotuję teraz</Button>
+        </div>
         <ol className="mt-3 space-y-3">
           {recipe.steps.map((s, i) => (
             <li key={i} className="flex gap-3 rounded-2xl bg-card p-4">
@@ -179,6 +184,7 @@ function OriginalRecipePage() {
           ))}
         </ol>
       </section>
+      {cooking && <CookingMode name={recipe.name} steps={recipe.steps} onClose={() => setCooking(false)} />}
     </main>
   );
 }
