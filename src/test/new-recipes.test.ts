@@ -1,7 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import {newRecipes} from '@/data/recipes-new';
-import {newNutrition} from '@/data/nutrition-new';
-import {recipes,weeks,type Item} from '@/data/recipes';
+import {recipes,weeks} from '@/data/recipes';
 import {ingredients} from '@/data/ingredients';
 import {computeMacros,recipeItems,searchRecipes} from '@/lib/meals';
 import {blankWeek,customShopping,copyOriginal} from '@/lib/custom-data';
@@ -19,8 +18,8 @@ describe('24 added recipes',()=>{
    else if(id==='n_ryz')expect([110,115]).toContain(pg);else if(id==='n_ziemniak')expect([380,400]).toContain(pg);else if(id==='n_lasagne')expect(pg).toBe(110);else if(id==='n_gnocchi')expect(pg).toBe(280);else if(id==='n_tortilla')expect(pg).toBe(120);else{expect(pg).toBeGreaterThanOrEqual(g);expect(pg).toBeLessThanOrEqual(g*1.3);}}
  });
  it('calculates every macro from actual ingredients before rounding',()=>{for(const r of newRecipes)for(const items of [r.ingredients,...(r.partner?[recipeItems(r,true)]:[])]){const m=computeMacros(items);expect(m.missing).toEqual([]);for(const key of ['kcal','p','f','c'] as const){const sum=items.reduce((acc,[id,g])=>acc+(ingredients[id][key]??0)*g/100,0);expect(m[key]).toBe(key==='kcal'?Math.round(sum):Math.round(sum*10)/10);}}});
- it('computes concrete Tuscan portions without double counting',()=>{const r=required(newRecipes.find(r=>r.id==='nowe-kurczak-toskanski'));expect(computeMacros(r.ingredients)).toEqual({kcal:711,p:57.8,f:31.7,c:44.2,missing:[]});expect(computeMacros(recipeItems(r,true))).toEqual({kcal:998,p:73.6,f:33.4,c:94.9,missing:[]});});
+ it('computes concrete Tuscan portions without double counting',()=>{const r=required(newRecipes.find(r=>r.id==='nowe-kurczak-toskanski'));expect(computeMacros(r.ingredients)).toEqual({kcal:711,p:57,f:31.7,c:43.8,missing:[]});expect(computeMacros(recipeItems(r,true))).toEqual({kcal:999,p:72.8,f:33.4,c:94.5,missing:[]});});
  it('searches all added recipes and filters favorites',()=>{for(const r of newRecipes){expect(searchRecipes(r.name)).toContain(r);expect(searchRecipes('',{favs:[r.id]}).map(x=>x.id)).toEqual([r.id]);}});
  it('aggregates new and existing recipes in own week shopping',()=>{const w=blankWeek('Test');const d=required(w.days[0]);d.sniadanie='nowe-bajgiel-jajko';d.kolacja='nowe-kurczak-toskanski';const rows=customShopping(w,[]);expect(rows.find(r=>r.name==='Jajka')?.amount).toBe(55);expect(rows.find(r=>r.name==='Ryż biały (suchy)')?.amount).toBe(45);});
- it('copies full partner portion into editable extra ingredients and macros',()=>{const copy=required(copyOriginal('nowe-kurczak-toskanski'));expect(copy.partner?.extra.find(i=>i.name==='Ryż biały (suchy)')?.amount).toBe(65);expect(copy.partner?.extra.find(i=>i.name==='Pierś z kurczaka')?.amount).toBe(50);expect(copy.partner?.macros?.kcal).toBe(998);});
+ it('copies full partner portion into editable extra ingredients and macros',()=>{const copy=required(copyOriginal('nowe-kurczak-toskanski'));expect(copy.partner?.extra.find(i=>i.name==='Ryż biały (suchy)')?.amount).toBe(65);expect(copy.partner?.extra.find(i=>i.name==='Pierś z kurczaka')?.amount).toBe(50);expect(copy.partner?.macros?.kcal).toBe(999);});
 });

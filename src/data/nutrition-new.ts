@@ -2,6 +2,12 @@ import type { Ingredient } from './ingredients';
 // Jawne wartości orientacyjne na 100 g; oddzielny zestaw nie zmienia makro starej bazy.
 // W = węglowodany przyswajalne (bez błonnika). Energia jest wartością tabelaryczną,
 // nie zawsze równą 4B+9T+4W (błonnik, kwasy organiczne, zaokrąglenia etykiet).
+// Punkty odniesienia: USDA https://fdc.nal.usda.gov/ (surowe produkty;
+// available carbs = total carbs minus fibre); polskie/europejskie etykiety:
+// twaróg https://www.osmsieradz.pl/product/index/twarogi/37 (127/18/4/3.5),
+// kakao https://kalkulatorkalorii.net/kalkulator-kalorii/20564-100-kakao-naturalne-biedronka
+// (303/24/10.5/13). Pozostałe przetworzone produkty = zaokrąglone typowe profile,
+// nie dane konkretnej marki; szczególnie sosy, hummus, pasztet i wędliny są zmienne.
 export const newNutrition = {
   n_bajgiel: {name:'Bajgiel',aisle:'Pieczywo',kcal:270,p:10,f:2,c:51},
   n_jajko: {name:'Jajka',aisle:'Nabiał i jajka',kcal:143,p:12.6,f:9.5,c:0.7},
@@ -9,7 +15,7 @@ export const newNutrition = {
   n_cheddar: {name:'Cheddar',aisle:'Nabiał i jajka',kcal:403,p:25,f:33,c:1.3},
   n_skyr: {name:'Skyr naturalny',aisle:'Nabiał i jajka',kcal:63,p:11,f:0.2,c:4},
   n_rukola: {name:'Rukola',aisle:'Warzywa i owoce',kcal:25,p:2.6,f:0.7,c:2.1},
-  n_twarog: {name:'Twaróg półtłusty',aisle:'Nabiał i jajka',kcal:133,p:18.7,f:4.7,c:3.7},
+  n_twarog: {name:'Twaróg półtłusty',aisle:'Nabiał i jajka',kcal:127,p:18,f:4,c:3.5},
   n_maka_owsiana: {name:'Mąka owsiana',aisle:'Suche i puszki',kcal:389,p:13,f:7,c:64},
   n_maliny: {name:'Maliny (świeże/mrożone)',aisle:'Warzywa i owoce',kcal:52,p:1.2,f:0.7,c:5.4},
   n_olej: {name:'Olej rzepakowy',aisle:'Sosy i dodatki',kcal:884,p:0,f:100,c:0},
@@ -36,7 +42,7 @@ export const newNutrition = {
   n_losos_wedzony: {name:'Łosoś wędzony',aisle:'Mięso i ryby',kcal:180,p:22,f:10,c:0},
   n_serek_light: {name:'Serek śmietankowy light',aisle:'Nabiał i jajka',kcal:150,p:8,f:11,c:4},
   n_banan: {name:'Banan',aisle:'Warzywa i owoce',kcal:89,p:1.1,f:0.3,c:20.2},
-  n_kakao: {name:'Kakao naturalne',aisle:'Suche i puszki',kcal:303,p:23,f:11,c:13},
+  n_kakao: {name:'Kakao naturalne',aisle:'Suche i puszki',kcal:303,p:24,f:10.5,c:13},
   n_maslo_orzechowe: {name:'Masło orzechowe',aisle:'Suche i puszki',kcal:588,p:25,f:50,c:14},
   n_pasztet: {name:'Pasztet drobiowy',aisle:'Mięso i ryby',kcal:290,p:12,f:25,c:4},
   n_kiszony: {name:'Ogórek kiszony',aisle:'Warzywa i owoce',kcal:12,p:0.5,f:0.1,c:1.2},
@@ -45,7 +51,7 @@ export const newNutrition = {
   n_suszone: {name:'Suszone pomidory w oleju (odsączone)',aisle:'Suche i puszki',kcal:213,p:5.1,f:14.1,c:13.4},
   n_smietanka: {name:'Śmietanka 18%',aisle:'Nabiał i jajka',kcal:190,p:2.5,f:18,c:4},
   n_parmezan: {name:'Parmezan',aisle:'Nabiał i jajka',kcal:402,p:32,f:30,c:0},
-  n_indyk: {name:'Mięso mielone z indyka (około 7% tłuszczu)',aisle:'Mięso i ryby',kcal:153,p:20,f:8,c:0},
+  n_indyk: {name:'Mięso mielone z indyka (około 8% tłuszczu)',aisle:'Mięso i ryby',kcal:153,p:20,f:8,c:0},
   n_brokul: {name:'Brokuł',aisle:'Warzywa i owoce',kcal:34,p:2.8,f:0.4,c:4},
   n_teriyaki: {name:'Sos teriyaki',aisle:'Sosy i dodatki',kcal:120,p:3,f:0,c:27},
   n_sezam: {name:'Sezam',aisle:'Suche i puszki',kcal:573,p:18,f:50,c:11.7},
