@@ -13,15 +13,12 @@ export function CookingMode({ name, steps, ingredients, note, onClose }: {
 }) {
   const [done, setDone] = useState<boolean[]>(() => steps.map(() => false));
   const [showItems, setShowItems] = useState(true);
-  const [wakeLock, setWakeLock] = useState<'on' | 'off' | 'unsupported'>('off');
 
   useEffect(() => {
     let lock: { release: () => Promise<void> } | null = null;
     let cancelled = false;
     const nav = navigator as Navigator & { wakeLock?: { request: (type: 'screen') => Promise<{ release: () => Promise<void> }> } };
-    if (nav.wakeLock) {
-      nav.wakeLock.request('screen').then(l => { if (cancelled) { void l.release(); } else { lock = l; setWakeLock('on'); } }).catch(() => setWakeLock('unsupported'));
-    } else setWakeLock('unsupported');
+    nav.wakeLock?.request('screen').then(l => { if (cancelled) void l.release(); else lock = l; }).catch(() => undefined);
     document.body.style.overflow = 'hidden';
     return () => { cancelled = true; document.body.style.overflow = ''; if (lock) void lock.release(); };
   }, []);
