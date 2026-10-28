@@ -23,6 +23,8 @@ export type Recipe = {
   spices?: string; // przyprawy bez wpływu na makro
   steps: string[];
   rawWeights?: boolean;
+  /** Wypieki liczone na sztuki/kromki: składniki w `ingredients` są za JEDNĄ sztukę/kromkę. */
+  yield?: { count: number; unit: string; bakedGrams?: number };
   proteinVariant?: { note: string; extra: Item[] };
   partner?: { note: string; extra: Item[]; ingredients?: Item[] };
 };
