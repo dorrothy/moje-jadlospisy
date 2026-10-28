@@ -8,6 +8,7 @@ import { collectionRecipes } from './recipes-collections';
 import type { Equipment } from './equipment';
 import { additionalWeeks } from './weeks-new';
 import { bakingRecipes } from './recipes-baking';
+import { extraRecipes } from './recipes-extra';
 
 export type MealType = "sniadanie" | "obiad" | "deser" | "kolacja";
 export type Item = [IngredientId, number, string?]; // [składnik, gramy, uwaga]
@@ -24,6 +25,8 @@ export type Recipe = {
   spices?: string; // przyprawy bez wpływu na makro
   steps: string[];
   rawWeights?: boolean;
+  /** Praktyczne tagi, np. „do 20 minut”, „meal prep”, „do lunchboxa”. */
+  tags?: string[];
   /** Wypieki liczone na sztuki/kromki: składniki w `ingredients` są za JEDNĄ sztukę/kromkę. */
   yield?: { count: number; unit: string; bakedGrams?: number };
   proteinVariant?: { note: string; extra: Item[] };
@@ -42,6 +45,7 @@ const pasta = (g = 90): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopak
 const potato = (g = 250): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopaka: ${g} g gotowanych ziemniaków do tej samej porcji.`, extra: [["ziemniak", g]] });
 
 export const recipes: Recipe[] = [
+  ...extraRecipes,
   ...bakingRecipes,
   ...collectionRecipes,
   ...polishRecipes,

@@ -21,7 +21,7 @@ export type Goals={kcalMin:number;kcalMax:number;pMin:number;pMax:number;maxMinu
 export const defaultGoals:Goals={kcalMin:1700,kcalMax:1800,pMin:120,pMax:145,maxMinutes:120,equipment:[],mealPrep:false,onlyFavorites:false,excluded:[]};
 export function isSoup(r:RecipeView){return r.type==='obiad'&&/zup|krem|soup|ramen/.test(normalize(`${r.name} ${r.category}`));}
 export function eligibleRecipes(all:RecipeView[],g:Goals,favs:string[]){return all.filter(r=>r.complete&&r.minutes<=g.maxMinutes&&(!g.onlyFavorites||favs.includes(r.id))&&(!g.equipment.length||r.equipment.every(e=>g.equipment.includes(e)))&&!g.excluded.some(ex=>[...r.items.map(i=>i.name),r.spices].some(n=>ingredientKey(n)===ingredientKey(ex)||normalize(n).includes(normalize(ex)))));}
-export function slotPool(all:RecipeView[],type:MealType){return all.filter(r=>type==='obiad'?isSoup(r):type==='kolacja'?r.type==='kolacja'||(r.type==='obiad'&&!isSoup(r)):r.type===type);}
+export function slotPool(all:RecipeView[],type:MealType){return all.filter(r=>r.category!=='Sosy i dodatki'&&(type==='obiad'?isSoup(r):type==='kolacja'?r.type==='kolacja'||(r.type==='obiad'&&!isSoup(r)):r.type===type));}
 export function totals(day:Record<MealType,string|null>,all:RecipeView[]){return Object.values(day).reduce((m,id)=>{const r=all.find(r=>r.id===id);return {kcal:m.kcal+(r?.macros.kcal??0),p:m.p+(r?.macros.p??0)};},{kcal:0,p:0});}
 function distance(n:number,min:number,max:number){return n<min?min-n:n>max?n-max:0;}
 export function generatePlan(all:RecipeView[],g:Goals,favs:string[],offset=0){

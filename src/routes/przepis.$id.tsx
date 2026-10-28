@@ -92,7 +92,8 @@ function OriginalRecipePage() {
         <div className="flex flex-wrap gap-2 text-xs font-medium">
           <span className="rounded-full bg-card px-2.5 py-1">{typeLabel[recipe.type]}</span>
           <span className="rounded-full bg-card px-2.5 py-1">{recipe.category}</span>
-          {recipe.collection && <span className="rounded-full bg-card px-2.5 py-1">{recipe.collection}</span>}
+          {recipe.collection && recipe.collection !== recipe.category && <span className="rounded-full bg-card px-2.5 py-1">{recipe.collection}</span>}
+          {recipe.tags?.map(t=><span key={t} className="rounded-full bg-card px-2.5 py-1">#{t}</span>)}
           {recipeEquipment(recipe).map(id=><span key={id} className="rounded-full bg-card px-2.5 py-1">{equipmentLabels[id]}</span>)}
           <span className="inline-flex items-center gap-1 rounded-full bg-card px-2.5 py-1"><Clock className="h-3 w-3" />{recipe.minutes} min</span>
           {weeksOfRecipe(recipe.id).map((w) => (
