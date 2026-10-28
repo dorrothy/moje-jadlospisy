@@ -4,10 +4,10 @@ import { Plus, Copy, Trash2, Pencil, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WeekStyleDialog } from '@/components/WeekStyleDialog';
 import { useLocalData } from '@/lib/local-data';
-import { blankWeek, newId, weekBgClass, weekEmoji, type WeekColor } from '@/lib/custom-data';
+import { blankWeek, newId, weekBgClass, weekEmoji } from '@/lib/custom-data';
 import { pageHead } from '@/lib/page-head';
 export const Route=createFileRoute('/moje-tygodnie')({head:()=>pageHead('Moje tygodnie','Własne tygodnie posiłków zapisane lokalnie na tym urządzeniu.'),component:MyWeeks});
-function MyWeeks(){const {data,update,ready}=useLocalData();const [createOpen,setCreateOpen]=useState(false);
+function MyWeeks(){const {data,update,ready}=useLocalData();const [createOpen,setCreateOpen]=useState(false);const [editing,setEditing]=useState<string|null>(null);
  return <main className="space-y-5 px-4 pt-6"><h1 className="text-3xl font-bold">Moje tygodnie</h1>
  <Button disabled={!ready} onClick={()=>setCreateOpen(true)}><Plus/>Nowy tydzień</Button>
  {data.weeks.length===0&&<p className="text-sm text-muted-foreground">Nie masz jeszcze własnych tygodni.</p>}
@@ -32,8 +32,8 @@ function MyWeeks(){const {data,update,ready}=useLocalData();const [createOpen,se
   </div>;})}
  </div>
  <Button asChild variant="outline"><Link to="/">Oryginalne cztery tygodnie</Link></Button>
- <WeekStyleDialog open={createOpen} initial={{name:''}} onCancel={()=>setCreateOpen(false)}
-  onSave={({name,emoji,color})=>{if(update(d=>({...d,weeks:[...d.weeks,{...blankWeek(name),emoji,color} as {id:string;name:string;days:ReturnType<typeof blankWeek>['days'];emoji?:string;color?:WeekColor}]})))setCreateOpen(false);}}/>
- <WeekStyleDialog open={editing!==null} initial={editing?(data.weeks.find(w=>w.id===editing)??{name:''}):{name:''}} onCancel={()=>setEditing(null)}
+ <WeekStyleDialog key={createOpen?'create-open':'create-closed'} open={createOpen} initial={{name:''}} onCancel={()=>setCreateOpen(false)}
+  onSave={({name,emoji,color})=>{if(update(d=>({...d,weeks:[...d.weeks,{...blankWeek(name),emoji,color}]})))setCreateOpen(false);}}/>
+ <WeekStyleDialog key={editing??'editing-closed'} open={editing!==null} initial={editing?(data.weeks.find(w=>w.id===editing)??{name:''}):{name:''}} onCancel={()=>setEditing(null)}
   onSave={({name,emoji,color})=>{if(update(d=>({...d,weeks:d.weeks.map(x=>x.id===editing?{...x,name,emoji,color}:x)})))setEditing(null);}}/>
  </main>;}
