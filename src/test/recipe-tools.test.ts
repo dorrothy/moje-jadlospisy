@@ -1,6 +1,6 @@
 import { describe,it,expect } from 'vitest';
 import { defaultGoals, ingredientKey, matchFridge, fridgeRanking, generatePlan, recipeViews, isSoup, eligibleRecipes, totals, type RecipeView } from '@/lib/recipe-tools';
-import { emptyData, parseImport, mergeImport, type LocalData } from '@/lib/custom-data';
+import { emptyData, parseImport, mergeImport, copyOriginal, type LocalData } from '@/lib/custom-data';
 import { reviewMatches, reviewSort } from '@/lib/reviews';
 const all=recipeViews([]);
 function sample(items:RecipeView['items']):RecipeView{return {id:'test',name:'Test',type:'sniadanie',category:'Test',minutes:10,equipment:[],items,macros:{kcal:400,p:30,f:10,c:40},complete:true,spices:''};}
@@ -21,5 +21,6 @@ describe('reviews and expanded backups',()=>{
  it('filters ratings and tested recipes consistently',()=>{expect(reviewMatches('a',reviews,4,true)).toBe(true);expect(reviewMatches('b',reviews,4,false)).toBe(false);expect(reviewMatches('b',reviews,0,true)).toBe(false);expect(reviewMatches('missing',reviews,1,false)).toBe(false);expect(reviewSort('b','a',reviews,'rating')).toBeGreaterThan(0);});
  it('validates 1–5 integer stars and real cooking dates',()=>{for(const rating of [0,6,2.5])expect(()=>parseImport(JSON.stringify({...emptyData,reviews:{a:{rating,note:'',cooked:''}}}))).toThrow();expect(()=>parseImport(JSON.stringify({...emptyData,reviews:{a:{note:'',cooked:'2026-02-31'}}}))).toThrow();});
  it('roundtrips notes, pantry and additional shopping while accepting old JSON',()=>{const d:LocalData={...emptyData,reviews,pantry:[{name:'Jajka',amount:55,unit:'g'}],extraShopping:[{name:'Mleko',amount:100,unit:'ml',checked:true}]};expect(parseImport(JSON.stringify(d))).toEqual(d);expect(parseImport(JSON.stringify(emptyData))).toEqual(emptyData);});
+ it('remaps reviews onto colliding imported custom recipes',()=>{const recipe=copyOriginal('polskie-schabowy');if(!recipe)throw new Error('recipe');const d:LocalData={...emptyData,recipes:[recipe],reviews:{[recipe.id]:{rating:4,note:'Moja notatka',cooked:'2026-10-28'}}};const merged=mergeImport(d,d);const added=merged.recipes[1];if(!added)throw new Error('added');expect(added.id).not.toBe(recipe.id);expect(merged.reviews?.[added.id]?.rating).toBe(4);expect(merged.reviews?.[recipe.id]?.note).toBe('Moja notatka');});
  it('does not overwrite existing ratings, cooking dates or notes on conflict',()=>{const current={...emptyData,reviews};const incoming={...emptyData,reviews:{a:{rating:1,note:'Druga notatka',cooked:'2025-01-01'}}};const merged=mergeImport(current,incoming);expect(merged.reviews?.['a']?.rating).toBe(5);expect(merged.reviews?.['a']?.cooked).toBe('2026-10-28');expect(merged.reviews?.['a']?.note).toContain('Pyszne');expect(merged.reviews?.['a']?.note).toContain('Druga notatka');});
 });
