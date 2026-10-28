@@ -1,4 +1,8 @@
 # Zadania
+- [ ] Dodać tygodnie 5 „Świeżo i kolorowo” i 6 „Azja i Włochy” bez zmian poprzednich planów
+- [ ] Dopasować rzeczywiste porcje i sprawdzić 14 dni: 1700–1800 kcal, 120–145 g białka
+- [ ] Pokazać pełne makro posiłków, dni i średnie; zachować porcje w kopiach, zakupach i backupie
+- [ ] Sprawdzić nowe tygodnie i zamianę posiłku na telefonie
 - [x] Dodać 24 przepisy: Sałatki 6, Deserki 8, Azjatyckie 5, Włoskie 5
 - [x] Osobne makro gnocchi z kurczakiem i większe porcje dań głównych
 - [x] Sprawdzić kolekcje, generator, zakupy i zachowanie istniejących danych
