@@ -51,7 +51,7 @@ export function weeksOfRecipe(id: string) {
   return weeks.filter((w) => w.days.some((d) => Object.values(d).includes(id))).map((w) => w.n);
 }
 
-export function searchRecipes(q: string, opts: { week?: number | undefined; type?: MealType | undefined; favs?: string[] | undefined; equipment?: Equipment; collection?: string } = {}) {
+export function searchRecipes(q: string, opts: { week?: number | undefined; type?: MealType | undefined; favs?: string[] | undefined; equipment?: Equipment | undefined; collection?: string | undefined } = {}) {
   const nq = normalize(q);
   return recipes.filter((r) => {
     if (opts.type && r.type !== opts.type) return false;

@@ -5,7 +5,7 @@ export const polishCollection = 'Polskie klasyki i zapiekanki';
 const poultrySafety = 'Sprawdź termometrem: drób musi osiągnąć co najmniej 74°C w środku; w razie potrzeby wydłuż obróbkę. Większą porcję piecz bez ścisku, partiami.';
 function dish(id: string, name: string, type: Recipe['type'], minutes: number, equipment: Equipment[], ingredients: Item[], steps: string[], partner?: Item[], note?: string): Recipe {
   return { id: `polskie-${id}`, name, type, category: type === 'sniadanie' ? 'Śniadanie' : 'Obiad / kolacja', collection: polishCollection, equipment, minutes, ingredients, steps, rawWeights: true,
-    partner: partner ? { extra: [], ingredients: partner, note: note ?? 'Oddzielna większa porcja: przełącz, aby zobaczyć pełne gramatury i osobne szacunkowe makro. Zachowaj temperaturę, dopasuj czas i wielkość naczynia.' } : undefined };
+    ...(partner ? { partner: { extra: [], ingredients: partner, note: note ?? 'Oddzielna większa porcja: przełącz, aby zobaczyć pełne gramatury i osobne szacunkowe makro. Zachowaj temperaturę, dopasuj czas i wielkość naczynia.' } } : {}) };
 }
 export const polishRecipes: Recipe[] = [
   dish('schabowy', 'Schabowy z mizerią', 'obiad', 40, ['air-fryer','stovetop'],

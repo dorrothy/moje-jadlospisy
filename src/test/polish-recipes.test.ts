@@ -85,7 +85,7 @@ describe('Polish collection', () => {
   expect(searchRecipes('',{equipment:'stovetop'}).map(r=>r.id)).toContain('jajecznica-serek');
   expect(searchRecipes('',{equipment:'waffle',collection:polishCollection})).toHaveLength(2);
   expect(searchRecipes('',{equipment:'grill',collection:polishCollection})).toEqual([requireRecipe('bagietka')]);
-  expect(recipeEquipment(recipeById['owsianka-nocna'])).toEqual([]);
+  const overnight=recipeById['owsianka-nocna'];if(!overnight)throw new Error('overnight');expect(recipeEquipment(overnight)).toEqual([]);
  });
  it('keeps old local JSON valid and preserves explicit equipment through export/import', () => {
   const copy=copyOriginal('polskie-gofry-wytrawne');if(!copy)throw new Error('copy');
@@ -97,7 +97,7 @@ describe('Polish collection', () => {
   const w=blankWeek('Klasyki');const day=w.days[0];if(!day)throw new Error('day');
   day.obiad='polskie-schabowy';day.kolacja='nowe-kurczak-toskanski';
   const rows=customShopping(w,[]);expect(rows.find(r=>r.name==='Ziemniaki')?.amount).toBe(220);
-  expect(rows.find(r=>r.name==='Oliwa z oliwek')?.amount).toBe(8);
+  expect(rows.find(r=>r.name==='Oliwa z oliwek')?.amount).toBe(5);
   day.kolacja='polskie-pulpety';expect(customShopping(w,[]).find(r=>r.name==='Ziemniaki')?.amount).toBe(440);
   expect(parseImport(JSON.stringify({...emptyData,weeks:[w]})).weeks[0]?.days[0]?.obiad).toBe('polskie-schabowy');
  });

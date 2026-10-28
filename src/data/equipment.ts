@@ -8,7 +8,7 @@ export const equipmentLabels = {
 export type Equipment = keyof typeof equipmentLabels;
 
 /** Browser-safe shared inference for legacy and custom recipes; does not alter stored data. */
-export function recipeEquipment(recipe: { equipment?: Equipment[]; steps: string[] }): Equipment[] {
+export function recipeEquipment(recipe: { equipment?: Equipment[] | undefined; steps: string[] }): Equipment[] {
   if (recipe.equipment) return recipe.equipment;
   const steps = recipe.steps.join(' ').toLowerCase();
   const tags: Equipment[] = [];
@@ -16,6 +16,6 @@ export function recipeEquipment(recipe: { equipment?: Equipment[]; steps: string
   if (/piekarnik|piecz|zapiecz/.test(steps) && !/gofrownic/.test(steps)) tags.push('oven');
   if (/grill/.test(steps)) tags.push('grill');
   if (/gofrownic/.test(steps)) tags.push('waffle');
-  if (/patelni|garnk|gotuj|ugotuj|zagotuj|podgotuj|smaż|podsmaż|obsmaż|duś|podd[uś]/.test(steps)) tags.push('stovetop');
+  if (/patelni|garnk|gotuj|gotowan|wrząt|zagotuj|podgotuj|smaż|smażon|duś|dusi|zeszklij|rozpuść/.test(steps)) tags.push('stovetop');
   return tags;
 }
