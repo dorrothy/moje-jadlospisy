@@ -9,7 +9,7 @@ import { useState } from "react";
 import { recipeById } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
-import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatGrams, recipeItems } from "@/lib/meals";
+import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import { RecipeReview, ReviewSummary } from '@/components/RecipeReview';
 import { RecipePhotos } from '@/components/RecipePhotos';
@@ -54,9 +54,10 @@ function OriginalRecipePage() {
   const { isFav, toggle } = useFavorites();
   const [servings, setServings] = useState(1);
   const [forHim, setForHim] = useState(false);
+  const [protein, setProtein] = useState(false);
   if (!recipe) return null;
-  const m = computeMacros(recipe.ingredients);
-  const partnerM = recipe.partner ? computeMacros(recipeItems(recipe, true)) : null;
+  const m = computeMacros(recipeItems(recipe,false,protein));
+  const partnerM = recipe.partner ? computeMacros(recipeItems(recipe, true, protein)) : null;
   const shown = forHim && partnerM ? partnerM : m;
   const fav = isFav(recipe.id);
 
@@ -71,7 +72,7 @@ function OriginalRecipePage() {
         </button>
       </div>
 
-      <Button variant="outline" className="mt-3" onClick={() => setCopy(copyOriginal(recipe.id))}>Duplikuj jako własny</Button>
+      <Button variant="outline" className="mt-3" onClick={() => setCopy(copyOriginal(recipe.id,protein))}>Duplikuj jako własny</Button>
       <RecipeReview id={recipe.id}/><ReviewSummary id={recipe.id}/>
       {copy && <RecipeEditor initial={copy} onClose={() => setCopy(undefined)} onSave={r => { if (update(d => ({...d, recipes:[...d.recipes,r]}))) setCopy(undefined); }} />}
       <header className="bg-hero mt-3 rounded-3xl p-5 shadow-soft">
@@ -96,7 +97,7 @@ function OriginalRecipePage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground">
-          Wartości szacunkowe na 1 porcję{forHim ? " (wersja dla chłopaka)" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
+          Wartości szacunkowe na 1 porcję{forHim ? " (wersja dla chłopaka)" : ""}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
         </p>
         {recipe.rawWeights && <p className="mt-2 text-xs text-muted-foreground">Masy przed obróbką: jajka bez skorupki, owoce i warzywa bez niejadalnych części, konserwy odsączone. Ryż i makaron ważone na sucho. Drobne przyprawy bez gramatur nie są wliczone.</p>}
         {shown.missing.length > 0 && (
@@ -107,6 +108,7 @@ function OriginalRecipePage() {
       </header>
       <RecipePhotos recipeId={recipe.id}/>
 
+      {recipe.proteinVariant && <label className="mt-4 flex items-start gap-3 rounded-lg border bg-card p-4 text-sm"><input type="checkbox" checked={protein} onChange={e=>setProtein(e.target.checked)} className="mt-1"/><span><strong className="block">Wariant wysokobiałkowy: kurczak 120 g</strong>{recipe.proteinVariant.note}<span className="mt-2 block text-muted-foreground">Aby zaplanować ten wariant i uwzględnić go w zakupach, wybierz „Duplikuj jako własny” po zaznaczeniu opcji.</span></span></label>}
       {recipe.partner && (
         <Button variant="ghost" aria-pressed={forHim}
           onClick={() => setForHim((v) => !v)}
@@ -138,7 +140,7 @@ function OriginalRecipePage() {
               <tr><th className="px-3 py-2 text-left font-medium">Składnik</th><th className="px-2 py-2 text-right font-medium">Ilość</th><th className="px-3 py-2 text-right font-medium">kcal / B</th></tr>
             </thead>
             <tbody>
-              {recipeItems(recipe, forHim).map((it, i) => {
+              {recipeItems(recipe, forHim, protein).map((it, i) => {
                 const im = itemMacros([it[0], it[1] * servings]);
                 return (
                   <tr key={i} className="border-t">
@@ -146,7 +148,7 @@ function OriginalRecipePage() {
                       {ingredients[it[0]].name}
                       {it[2] && <span className="ml-1 text-xs text-muted-foreground">({it[2]})</span>}
                     </td>
-                    <td className="px-2 py-2.5 text-right font-medium tabular-nums">{formatGrams(it[1] * servings)}</td>
+                    <td className="px-2 py-2.5 text-right font-medium tabular-nums">{formatItemAmount(it[0],it[1] * servings)}</td>
                     <td className="px-3 py-2.5 text-right text-xs tabular-nums text-muted-foreground">
                       {im ? `${im.kcal} / ${im.p} g` : <span className="text-warning-foreground">do uzupełnienia</span>}
                     </td>
@@ -157,7 +159,7 @@ function OriginalRecipePage() {
           </table>
         </div>
         {recipe.spices && <p className="mt-2 text-sm text-muted-foreground"><strong>Przyprawy:</strong> {recipe.spices}</p>}
-        {recipe.rawWeights && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer font-medium">Tabela wartości szacunkowych na 100 g</summary><p className="mt-2">Węglowodany przyswajalne, bez błonnika. Uśrednione dane tabelaryczne i typowe etykiety; marka i tłustość produktu zmieniają wynik. Energia z tabeli może różnić się od 4B + 9T + 4W.</p><ul className="mt-2 space-y-2">{recipeItems(recipe,forHim).map(([id]) => {const ing=ingredients[id];return <li key={id}>{ing.name}: {ing.kcal} kcal · B {ing.p} g · T {ing.f} g · W {ing.c} g</li>;})}</ul><p className="mt-2">Podstawa: <a className="underline" href="https://fdc.nal.usda.gov/" target="_blank" rel="noreferrer">USDA FoodData Central</a>, typowe europejskie etykiety produktów. To nie analiza laboratoryjna dania.</p></details>}
+        {recipe.rawWeights && <details className="mt-3 text-xs text-muted-foreground"><summary className="cursor-pointer font-medium">Tabela wartości szacunkowych na 100 g</summary><p className="mt-2">Węglowodany przyswajalne, bez błonnika. Uśrednione dane tabelaryczne i typowe etykiety; marka i tłustość produktu zmieniają wynik. Energia z tabeli może różnić się od 4B + 9T + 4W.</p><ul className="mt-2 space-y-2">{recipeItems(recipe,forHim,protein).map(([id]) => {const ing=ingredients[id];return <li key={id}>{ing.name}: {ing.kcal} kcal · B {ing.p} g · T {ing.f} g · W {ing.c} g</li>;})}</ul><p className="mt-2">Podstawa: <a className="underline" href="https://fdc.nal.usda.gov/" target="_blank" rel="noreferrer">USDA FoodData Central</a>, typowe europejskie etykiety produktów. To nie analiza laboratoryjna dania.</p></details>}
       </section>
 
       <section className="mt-6">

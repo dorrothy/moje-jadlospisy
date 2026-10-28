@@ -1,11 +1,11 @@
 import { ingredients } from '@/data/ingredients';
 import { recipes, type MealType } from '@/data/recipes';
 import { recipeEquipment, type Equipment } from '@/data/equipment';
-import { computeMacros, normalize } from './meals';
+import { computeMacros, normalize, ingredientUnit } from './meals';
 import type { CustomRecipe, CustomIngredient, LocalData } from './custom-data';
 
 export type RecipeView={id:string;name:string;type:MealType;category:string;minutes:number;equipment:Equipment[];items:CustomIngredient[];macros:{kcal:number;p:number;f:number;c:number};complete:boolean;spices:string};
-export function recipeViews(custom:CustomRecipe[]):RecipeView[]{return [...recipes.map(r=>{const m=computeMacros(r.ingredients);return {id:r.id,name:r.name,type:r.type,category:r.category,minutes:r.minutes,equipment:recipeEquipment(r),items:r.ingredients.map(([id,amount])=>({name:ingredients[id].name,amount,unit:'g' as const})),macros:m,complete:!m.missing.length,spices:r.spices??''};}),...custom.map(r=>({id:r.id,name:r.name,type:r.type,category:r.category,minutes:r.minutes,equipment:recipeEquipment(r),items:r.ingredients.map(i=>({...i,amount:i.amount/r.servings})),macros:r.macros,complete:true,spices:''}))];}
+export function recipeViews(custom:CustomRecipe[]):RecipeView[]{return [...recipes.map(r=>{const m=computeMacros(r.ingredients);return {id:r.id,name:r.name,type:r.type,category:r.category,minutes:r.minutes,equipment:recipeEquipment(r),items:r.ingredients.map(([id,amount])=>({name:ingredients[id].name,amount,unit:ingredientUnit(id)})),macros:m,complete:!m.missing.length,spices:r.spices??''};}),...custom.map(r=>({id:r.id,name:r.name,type:r.type,category:r.category,minutes:r.minutes,equipment:recipeEquipment(r),items:r.ingredients.map(i=>({...i,amount:i.amount/r.servings})),macros:r.macros,complete:true,spices:''}))];}
 // Only explicitly equivalent names; do not equate dry/cooked, cream strengths or different cuts.
 const aliases:Record<string,string>={ 'jajka':'jajko','jaja':'jajko','pomidory':'pomidor','pomidory swieze':'pomidor','ogorki':'ogorek','ogorek swiezy':'ogorek','ziemniaki':'ziemniak','kartofle':'ziemniak','kartofel':'ziemniak','piers z kurczaka':'piers kurczaka','filet z kurczaka':'piers kurczaka','oliwa z oliwek':'oliwa','olej rzepakowy':'olej rzepakowy','ryz bialy (suchy)':'ryz suchy','ryz bialy suchy':'ryz suchy','makaron pszenny (suchy)':'makaron suchy','pieczarki':'pieczarka','brokul':'brokuly','skyr naturalny':'skyr','maka':'maka pszenna','koperek swiezy':'koperek'};
 export function ingredientKey(s:string){const n=normalize(s).replace(/\s+/g,' ');return aliases[n]??n;}

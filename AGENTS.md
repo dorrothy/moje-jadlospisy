@@ -14,6 +14,8 @@
 - Import local JSON additively and remap colliding IDs plus assignments so existing data is never overwritten.
 
 - Add recipe collections via the shared bundled recipe index and isolate new nutrition profiles so previous recipe values and week assignments remain unchanged.
+- Derive collection filters from bundled and custom tags; keep optional protein variants separate from partner portions and materialize selected variants into custom copies for planning and backups without changing assignment schemas.
+- Declare liquid units by ingredient ID in the shared adapter so nutrition, recipe display, custom copies and shopping preserve ml without density inference.
 - Explicit partner ingredient lists replace the base portion; legacy extra ingredients remain additive, preventing double counting.
 - Equipment uses optional shared tags and read-time inference for legacy recipes; optional validated custom tags preserve old local exports without rewriting user data.
 - Fridge matching and week generation use a shared per-serving recipe adapter and pure local helpers; only compatible units and explicit synonyms match, with unknown quantities never treated as sufficient.
