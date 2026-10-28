@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function WeekStyleDialog({ open, initial, onSave, onCancel }: {
   open: boolean;
-  initial: { name: string; emoji?: string; color?: WeekColor };
+  initial: { name: string; emoji?: string | undefined; color?: WeekColor | undefined };
   onSave: (next: { name: string; emoji: string; color: WeekColor }) => void;
   onCancel: () => void;
 }) {
