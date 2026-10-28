@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Check, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { ingredientKey, unitAmount } from '@/lib/recipe-tools';
 import { pageHead } from '@/lib/page-head';
 export const Route=createFileRoute('/dodatkowe-zakupy')({head:()=>pageHead('Dodatkowe zakupy','Brakujące składniki z lodówki zapisane na lokalnej liście zakupów.'),component:ExtraShopping});

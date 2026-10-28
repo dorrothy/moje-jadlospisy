@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useLocalData } from "@/lib/local-data";
+import { useLocalData } from '@/lib/local-data-context';
 import { copyWeek, weekBgClass, weekEmoji } from "@/lib/custom-data";
 import { Pencil, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Check, Minus, Plus, RotateCcw } from "lucide-react";
-import { useLocalData } from "@/lib/local-data";
+import { useLocalData } from '@/lib/local-data-context';
 import { weeks } from "@/data/recipes";
 import { shoppingList, formatItemAmount } from "@/lib/meals";
 import { useStored } from "@/lib/storage";

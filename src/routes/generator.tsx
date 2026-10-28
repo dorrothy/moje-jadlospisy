@@ -4,7 +4,7 @@ import { RefreshCw, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog,DialogContent,DialogTitle,DialogDescription } from '@/components/ui/dialog';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { useFavorites } from '@/lib/storage';
 import { newId, type CustomWeek } from '@/lib/custom-data';
 import { defaultGoals, generatePlan, eligibleRecipes, slotPool, recipeViews, totals, type Goals } from '@/lib/recipe-tools';

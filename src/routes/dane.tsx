@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { Download, Upload, Images } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { parseImport, mergeImport, dataForBackup } from '@/lib/custom-data';
 import { makePhotoBackup, preparePhotoImport } from '@/lib/photo-backup';
 import { MAX_BACKUP_BYTES, photoError, writePhotos } from '@/lib/photos';

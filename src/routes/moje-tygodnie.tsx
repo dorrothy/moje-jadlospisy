@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Plus, Copy, Trash2, Pencil, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WeekStyleDialog } from '@/components/WeekStyleDialog';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { blankWeek, newId, weekBgClass, weekEmoji } from '@/lib/custom-data';
 import { pageHead } from '@/lib/page-head';
 export const Route=createFileRoute('/moje-tygodnie')({head:()=>pageHead('Moje tygodnie','Własne tygodnie posiłków zapisane lokalnie na tym urządzeniu.'),component:MyWeeks});

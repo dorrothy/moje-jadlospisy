@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Check, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { useStored } from '@/lib/storage';
 import { customShopping } from '@/lib/custom-data';
 import { pageHead } from '@/lib/page-head';

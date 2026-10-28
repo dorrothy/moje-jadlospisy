@@ -8,7 +8,7 @@ import { WeekStyleDialog } from '@/components/WeekStyleDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog,DialogContent,DialogTitle,DialogDescription } from '@/components/ui/dialog';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { matchesCustom, weekEmoji } from '@/lib/custom-data';
 import { searchRecipes, portionMacros, sumMacros } from '@/lib/meals';
 import { PlanNutrition } from '@/components/PlanNutrition';

@@ -3,7 +3,7 @@ import { ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
 import { OwnRecipePage } from "@/components/OwnRecipePage";
 import { RecipeEditor } from "@/components/RecipeEditor";
 import { Button } from "@/components/ui/button";
-import { useLocalData } from "@/lib/local-data";
+import { useLocalData } from '@/lib/local-data-context';
 import { copyOriginal, type CustomRecipe } from "@/lib/custom-data";
 import { useState } from "react";
 import { recipeById, type Recipe } from "@/data/recipes";

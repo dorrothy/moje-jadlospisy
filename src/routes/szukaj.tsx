@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { RecipeEditor } from "@/components/RecipeEditor";
 import { CustomRecipeCard } from "@/components/CustomRecipeCard";
-import { useLocalData } from "@/lib/local-data";
+import { useLocalData } from '@/lib/local-data-context';
 import { matchesCustom } from "@/lib/custom-data";
 import { Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
