@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { weeks, recipeById, mealSlots, type Week } from '@/data/recipes';
 import { ingredients } from '@/data/ingredients';
-import { portionItems, portionMacros, weekDayMacros, averageMacros, shoppingList, recipeItems, searchRecipes } from '@/lib/meals';
+import { portionItems, portionMacros, weekDayMacros, averageMacros, shoppingList, recipeItems, searchRecipes, normalize, ingredientUnit } from '@/lib/meals';
 import { copyWeek, customShopping, dataForBackup, parseImport, mergeImport, emptyData } from '@/lib/custom-data';
 import { originalAssignments } from './original-weeks-fixture';
 function getWeek(n: number): Week { const w=weeks.find(w=>w.n===n); if(!w)throw new Error('Missing week');return w; }
@@ -42,7 +42,7 @@ describe('ready weeks 5 and 6',()=>{
     for(const n of [5,6])for(const d of getWeek(n).days){const r=recipeById[d.kolacja];if(!r)throw new Error('Missing dinner');expect(r.partner).toBeDefined();expect(recipeItems(r,true)).not.toEqual(r.ingredients);}
   });
   it('shopping uses actual per-meal portions and matches copied-week shopping',()=>{
-    for(const n of [5,6]){const w=getWeek(n);const copied=copyWeek(w);const own=customShopping(copied,[]);for(const row of shoppingList(n,1))expect(own.find(i=>i.name===row.name)?.amount).toBeCloseTo(row.grams,8);
+    for(const n of [5,6]){const w=getWeek(n);const copied=copyWeek(w);const own=customShopping(copied,[]);const expected=new Map<string,number>();for(const row of shoppingList(n,1)){const key=`${normalize(row.name)}:${ingredientUnit(row.id)}`;expected.set(key,(expected.get(key)??0)+row.grams);}for(const row of own)expect(row.amount).toBeCloseTo(expected.get(row.id)??0,8);
       for(const row of shoppingList(n,2))expect(row.grams).toBeCloseTo((shoppingList(n,1).find(i=>i.id===row.id)?.grams??0)*2,8);
     }
   });
