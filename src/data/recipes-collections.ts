@@ -3,7 +3,7 @@ import type { Equipment } from './equipment';
 
 const dish = (id:string,name:string,collection:string,minutes:number,equipment:Equipment[],ingredients:Item[],steps:string[],partnerChanges:Item[]=[]):Recipe => ({
  id:`kolekcje-${id}`,name,collection,category:collection,type:collection==='Deserki'?'deser':'kolacja',minutes,equipment,ingredients,steps,rawWeights:true,
- ...(partnerChanges.length ? {partner:{note:'Oddzielna większa porcja: więcej dodatku węglowodanowego i białka. Gotuj do tej samej temperatury wewnętrznej; w razie potrzeby wydłuż czas.',extra:[],ingredients:[...ingredients.map(item=>partnerChanges.find(([key])=>key===item[0])??item),...partnerChanges.filter(([key])=>!ingredients.some(([base])=>base===key))]}}:{}),
+ ...(partnerChanges.length ? {partner:{note:'Oddzielna większa porcja: więcej dodatku węglowodanowego i białka. Dodatkowy ryż ugotuj według opakowania, a gnocchi 2–3 minuty do wypłynięcia; podaj obok dania. Gotuj mięso do tej samej temperatury wewnętrznej; w razie potrzeby wydłuż czas.',extra:[],ingredients:[...ingredients.map(item=>partnerChanges.find(([key])=>key===item[0])??item),...partnerChanges.filter(([key])=>!ingredients.some(([base])=>base===key))]}}:{}),
 });
 
 export const collectionRecipes:Recipe[] = [

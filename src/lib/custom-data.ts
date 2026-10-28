@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { recipes, mealSlots, type MealType } from '@/data/recipes';
 import { ingredients } from '@/data/ingredients';
-import { computeMacros, normalize, recipeItems } from '@/lib/meals';
+import { computeMacros, normalize, recipeItems, ingredientUnit } from '@/lib/meals';
 import { recipeEquipment } from '@/data/equipment';
 
 export const macroSchema = z.object({ kcal: z.number().finite().nonnegative(), p: z.number().finite().nonnegative(), f: z.number().finite().nonnegative(), c: z.number().finite().nonnegative() });
 export const ingredientSchema = z.object({ name: z.string().trim().min(1), amount: z.number().finite().positive(), unit: z.enum(['g', 'kg', 'ml', 'l', 'szt.', 'łyżka', 'łyżeczka']) });
-export const customRecipeSchema = z.object({ id: z.string().startsWith('own-'), name: z.string().trim().min(1), category: z.string().trim().min(1), collection: z.string().optional(), equipment: z.array(z.enum(['air-fryer','oven','grill','waffle','stovetop'])).optional(), type: z.enum(['sniadanie','obiad','deser','kolacja']), minutes: z.number().finite().int().positive(), servings: z.number().finite().int().positive(), ingredients: z.array(ingredientSchema).min(1), steps: z.array(z.string().trim().min(1)).min(1), macros: macroSchema, partner: z.object({ note: z.string().trim().min(1), extra: z.array(ingredientSchema), macros: macroSchema.optional() }).optional() });
+export const customRecipeSchema = z.object({ id: z.string().startsWith('own-'), name: z.string().trim().min(1), category: z.string().trim().min(1), collection: z.string().optional(), equipment: z.array(z.enum(['air-fryer','oven','grill','waffle','stovetop','no-cook','blender'])).optional(), type: z.enum(['sniadanie','obiad','deser','kolacja']), minutes: z.number().finite().int().positive(), servings: z.number().finite().int().positive(), ingredients: z.array(ingredientSchema).min(1), steps: z.array(z.string().trim().min(1)).min(1), macros: macroSchema, partner: z.object({ note: z.string().trim().min(1), extra: z.array(ingredientSchema), macros: macroSchema.optional() }).optional() });
 const daySchema = z.object({ sniadanie: z.string().nullable(), obiad: z.string().nullable(), deser: z.string().nullable(), kolacja: z.string().nullable() });
 export const customWeekSchema = z.object({ id: z.string().startsWith('week-'), name: z.string().trim().min(1), days: z.array(daySchema).length(7) });
 export const reviewSchema = z.object({ rating:z.number().int().min(1).max(5).optional(), note:z.string(), cooked:z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{const d=new Date(v);return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;}).or(z.literal('')) });
@@ -36,13 +36,14 @@ export function mergeImport(current: LocalData, incoming: LocalData, recipeRemap
   return {...current,...(current.reviews||incoming.reviews?{reviews}:{}),...(incoming.pantry?{pantry:[...(current.pantry??[]),...incoming.pantry]}:{}),...(incoming.extraShopping?{extraShopping:[...(current.extraShopping??[]),...incoming.extraShopping]}:{}), recipes:[...current.recipes,...added], weeks:[...current.weeks,...incoming.weeks.map(w=>{ const id=weekIds.has(w.id)?newId('week'):w.id; weekIds.add(id); return {...w,id,days:w.days.map(d=>Object.fromEntries(Object.entries(d).map(([s,r])=>[s,r ? remap.get(r) ?? r : null])) as CustomWeek['days'][number])}; })]};
 }
 export function matchesCustom(r: CustomRecipe, q: string) { const hay=normalize([r.name,r.category,r.collection ?? '',r.partner?.note ?? '',...r.ingredients.map(i=>i.name)].join(' ')); return normalize(q).split(/\s+/).every(t=>hay.includes(t)); }
-export function copyOriginal(id: string): CustomRecipe | undefined {
+export function copyOriginal(id: string, protein = false): CustomRecipe | undefined {
   const r=recipes.find(r=>r.id===id); if(!r) return;
-  const convert = (items: typeof r.ingredients): CustomIngredient[] => items.map(([id,amount]) => ({name:ingredients[id].name,amount,unit:'g'}));
-  const m=computeMacros(r.ingredients);
+  const convert = (items: typeof r.ingredients): CustomIngredient[] => items.map(([id,amount]) => ({name:ingredients[id].name,amount,unit:ingredientUnit(id)}));
+  const selected=recipeItems(r,false,protein);
+  const m=computeMacros(selected);
   const extra = r.partner?.ingredients ? r.partner.ingredients.map(([id,g]) => [id,g - (r.ingredients.find(([base])=>base===id)?.[1] ?? 0)] as typeof r.ingredients[number]).filter(([,g])=>g>0) : r.partner?.extra ?? [];
-  const pm = r.partner ? computeMacros(recipeItems(r,true)) : undefined;
-  return { id:newId('own'),name:`${r.name} — kopia`,category:r.category,collection:r.collection,equipment:recipeEquipment(r),type:r.type,minutes:r.minutes,servings:1,ingredients:convert(r.ingredients),steps:[...r.steps],macros:{kcal:m.kcal,p:m.p,f:m.f,c:m.c},partner:r.partner ? {note:r.partner.note,extra:convert(extra),macros:pm ? {kcal:pm.kcal,p:pm.p,f:pm.f,c:pm.c} : undefined} : undefined };
+  const pm = r.partner ? computeMacros(recipeItems(r,true,protein)) : undefined;
+  return { id:newId('own'),name:`${r.name}${protein ? " z kurczakiem" : ""} — kopia`,category:r.category,collection:r.collection,equipment:recipeEquipment(r),type:r.type,minutes:r.minutes,servings:1,ingredients:convert(selected),steps:[...r.steps,...(protein && r.proteinVariant ? [r.proteinVariant.note] : [])],macros:{kcal:m.kcal,p:m.p,f:m.f,c:m.c},partner:r.partner ? {note:r.partner.note,extra:convert(extra),macros:pm ? {kcal:pm.kcal,p:pm.p,f:pm.f,c:pm.c} : undefined} : undefined };
 }
 export type ShopItem = { id:string; name:string; amount:number; unit:string };
 export function customShopping(w: CustomWeek, custom: CustomRecipe[], portions=1): ShopItem[] {
@@ -50,7 +51,7 @@ export function customShopping(w: CustomWeek, custom: CustomRecipe[], portions=1
   for (const day of w.days) for (const slot of mealSlots) {
     const id=day[slot.type]; if(!id) continue;
     const own=custom.find(r=>r.id===id); const original=recipes.find(r=>r.id===id);
-    const items: CustomIngredient[]=own ? own.ingredients : original?.ingredients.map(([iid,g])=>({name:ingredients[iid].name,amount:g,unit:'g' as const})) ?? [];
+    const items: CustomIngredient[]=own ? own.ingredients : original?.ingredients.map(([iid,g])=>({name:ingredients[iid].name,amount:g,unit:ingredientUnit(iid)})) ?? [];
     for (const i of items) {
       const unit=i.unit==='kg'?'g':i.unit==='l'?'ml':i.unit;
       const amount=i.amount*(i.unit==='kg'||i.unit==='l'?1000:1)*portions/(own?.servings ?? 1);
