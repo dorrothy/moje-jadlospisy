@@ -1,0 +1,23 @@
+export const MAX_PHOTOS = 5;
+export const MAX_IMAGE_EDGE = 1600;
+export const MAX_INPUT_BYTES = 25 * 1024 * 1024;
+export const MAX_BACKUP_BYTES = 100 * 1024 * 1024;
+export type RecipePhoto = { id:string; recipeId:string; blob:Blob; created:number; order:number };
+export function resizedDimensions(width:number,height:number){if(width<=0||height<=0)throw new Error('Nieprawidłowy rozmiar obrazu.');const scale=Math.min(1,MAX_IMAGE_EDGE/Math.max(width,height));return {width:Math.max(1,Math.round(width*scale)),height:Math.max(1,Math.round(height*scale))};}
+export function photoError(error:unknown){if(error instanceof DOMException&&error.name==='QuotaExceededError')return 'Brak miejsca na zdjęcia. Pobierz kopię i usuń zbędne zdjęcia lub zwolnij miejsce.';if(error instanceof DOMException&&['SecurityError','NotAllowedError'].includes(error.name))return 'Przeglądarka odmówiła dostępu do pliku lub pamięci. Sprawdź uprawnienia i tryb prywatny.';return error instanceof Error?error.message:'Nie udało się zapisać zdjęcia. Spróbuj ponownie.';}
+function openDatabase():Promise<IDBDatabase>{return new Promise((resolve,reject)=>{if(typeof indexedDB==='undefined'){reject(new Error('Ta przeglądarka nie udostępnia lokalnej pamięci zdjęć.'));return;}const req=indexedDB.open('moje-przepisy-photos',1);req.onupgradeneeded=()=>{const store=req.result.createObjectStore('photos',{keyPath:'id'});store.createIndex('recipeId','recipeId');};req.onsuccess=()=>{req.result.onversionchange=()=>req.result.close();resolve(req.result);};req.onerror=()=>reject(req.error);req.onblocked=()=>reject(new Error('Zamknij inne karty aplikacji i spróbuj ponownie.'));});}
+export async function listPhotos(recipeId?:string):Promise<RecipePhoto[]>{const db=await openDatabase();try{return await new Promise((resolve,reject)=>{const tx=db.transaction('photos','readonly');const store=tx.objectStore('photos');const request=recipeId?store.index('recipeId').getAll(recipeId):store.getAll();request.onsuccess=()=>resolve((request.result as RecipePhoto[]).sort((a,b)=>a.order-b.order||a.created-b.created));request.onerror=()=>reject(request.error);});}finally{db.close();}}
+export async function writePhotos(put:RecipePhoto[],remove:string[]=[]){const db=await openDatabase();try{await new Promise<void>((resolve,reject)=>{const tx=db.transaction('photos','readwrite');tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error??new Error('Zapis zdjęć przerwany.'));const store=tx.objectStore('photos');remove.forEach(id=>store.delete(id));put.forEach(photo=>store.put(photo));});window.dispatchEvent(new Event('recipe-photos-changed'));}finally{db.close();}}
+export async function compressImage(file:Blob):Promise<Blob>{
+ if(!file.size||file.size>MAX_INPUT_BYTES)throw new Error('Wybierz zdjęcie do 25 MB.');
+ if(file.type==='image/svg+xml')throw new Error('Wybierz zdjęcie JPEG, PNG, WebP lub obsługiwany HEIC, nie SVG.');
+ const url=URL.createObjectURL(file);
+ try{
+  const image=await new Promise<HTMLImageElement>((resolve,reject)=>{const img=new Image();const timer=setTimeout(()=>{img.src='';reject(new Error('Odczyt zdjęcia trwa zbyt długo. Wybierz mniejszy plik JPEG.'));},20000);img.onload=()=>{clearTimeout(timer);resolve(img);};img.onerror=()=>{clearTimeout(timer);reject(new Error('Nie można odczytać tego obrazu. Jeśli to HEIC, zapisz go jako JPEG w Zdjęciach lub wybierz zgodny format.'));};img.src=url;});
+  if(image.naturalWidth*image.naturalHeight>60_000_000)throw new Error('Zdjęcie jest zbyt duże (ponad 60 megapikseli). Zmniejsz je w galerii i spróbuj ponownie.');
+  const size=resizedDimensions(image.naturalWidth,image.naturalHeight);const canvas=document.createElement('canvas');canvas.width=size.width;canvas.height=size.height;const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Brak możliwości przetworzenia zdjęcia.');ctx.fillStyle='#fff';ctx.fillRect(0,0,size.width,size.height);ctx.drawImage(image,0,0,size.width,size.height);
+  return await new Promise<Blob>((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Nie udało się skompresować obrazu.')),'image/jpeg',.82));
+ }finally{URL.revokeObjectURL(url);}
+}
+export async function photoToBase64(blob:Blob){return new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]??'');reader.onerror=()=>reject(new Error('Nie można odczytać zdjęcia do kopii.'));reader.readAsDataURL(blob);});}
+export function base64Photo(value:string){if(!/^[A-Za-z0-9+/]*={0,2}$/.test(value)||value.length>MAX_INPUT_BYTES*1.4)throw new Error('Nieprawidłowy obraz w kopii.');const raw=atob(value);return new Blob([Uint8Array.from(raw,c=>c.charCodeAt(0))],{type:'image/jpeg'});}

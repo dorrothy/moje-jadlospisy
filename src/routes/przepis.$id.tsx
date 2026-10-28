@@ -12,6 +12,7 @@ import { equipmentLabels, recipeEquipment } from '@/data/equipment';
 import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatGrams, recipeItems } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import { RecipeReview, ReviewSummary } from '@/components/RecipeReview';
+import { RecipePhotos } from '@/components/RecipePhotos';
 
 export const Route = createFileRoute("/przepis/$id")({
   loader: ({ params }) => {
@@ -104,6 +105,7 @@ function OriginalRecipePage() {
           </p>
         )}
       </header>
+      <RecipePhotos recipeId={recipe.id}/>
 
       {recipe.partner && (
         <Button variant="ghost" aria-pressed={forHim}
