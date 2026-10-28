@@ -35,6 +35,28 @@ export function recipeItems(recipe: Recipe, forHim = false, protein = false): It
   return protein && recipe.proteinVariant ? [...base, ...recipe.proteinVariant.extra] : base;
 }
 
+export function portionItems(recipe: Recipe, portion = 1): Item[] {
+  return recipe.ingredients.map(([id, amount]) => [id, amount * portion]);
+}
+export function portionMacros(recipe: Recipe, portion = 1): Macros {
+  return computeMacros(portionItems(recipe, portion));
+}
+export function sumMacros(values: Macros[]): Macros {
+  return { kcal: values.reduce((n, m) => n + m.kcal, 0), p: r1(values.reduce((n, m) => n + m.p, 0)), f: r1(values.reduce((n, m) => n + m.f, 0)), c: r1(values.reduce((n, m) => n + m.c, 0)), missing: [...new Set(values.flatMap(m => m.missing))] };
+}
+export function weekDayMacros(week: typeof weeks[number], index: number): Macros {
+  const day = week.days[index];
+  if (!day) return sumMacros([]);
+  return sumMacros(Object.entries(day).flatMap(([slot, id]) => {
+    const recipe = recipeById[id];
+    return recipe ? [portionMacros(recipe, week.portions?.[index]?.[slot as MealType] ?? 1)] : [];
+  }));
+}
+export function averageMacros(days: Macros[]): Macros {
+  const total = sumMacros(days); const count = days.length || 1;
+  return { kcal: Math.round(total.kcal / count), p: r1(total.p / count), f: r1(total.f / count), c: r1(total.c / count), missing: total.missing };
+}
+
 /** Explicit liquid units; never infer density or turn dry ingredients into ml. */
 export function ingredientUnit(id: IngredientId): 'g' | 'ml' {
   return ['c_espresso','c_stock','c_water'].includes(id) ? 'ml' : 'g';
@@ -80,13 +102,13 @@ export function shoppingList(weekN: number, servings: number): ShoppingRow[] {
   const week = weeks.find((w) => w.n === weekN);
   if (!week) return [];
   const map = new Map<IngredientId, ShoppingRow>();
-  for (const day of week.days) {
-    for (const rid of Object.values(day)) {
+  for (const [index, day] of week.days.entries()) {
+    for (const [slot, rid] of Object.entries(day)) {
       const rec = recipeById[rid];
       if (!rec) continue;
       for (const [id, g] of rec.ingredients) {
         const row = map.get(id) ?? { id, name: ingredients[id].name, aisle: ingredients[id].aisle, grams: 0, recipes: [] };
-        row.grams += g * servings;
+        row.grams += g * servings * (week.portions?.[index]?.[slot as MealType] ?? 1);
         if (!row.recipes.includes(rec)) row.recipes.push(rec);
         map.set(id, row);
       }

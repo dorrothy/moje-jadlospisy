@@ -6,6 +6,7 @@ import { newRecipes } from './recipes-new';
 import { polishRecipes } from './recipes-polish';
 import { collectionRecipes } from './recipes-collections';
 import type { Equipment } from './equipment';
+import { additionalWeeks } from './weeks-new';
 
 export type MealType = "sniadanie" | "obiad" | "deser" | "kolacja";
 export type Item = [IngredientId, number, string?]; // [składnik, gramy, uwaga]
@@ -275,7 +276,7 @@ export const recipeById = Object.fromEntries(recipes.map((r) => [r.id, r])) as R
 type Day = Record<MealType, string>;
 const d = (sniadanie: string, obiad: string, deser: string, kolacja: string): Day => ({ sniadanie, obiad, deser, kolacja });
 
-export type Week = { n: number; title: string; subtitle: string; emoji: string; days: Day[] };
+export type Week = { n: number; title: string; subtitle: string; emoji: string; days: Day[]; portions?: Partial<Record<MealType, number>>[] };
 
 export const weeks: Week[] = [
   { n: 1, title: "Budżetowy low-carb", subtitle: "Proste, tanie, mało węglowodanów", emoji: "🥚", days: [
@@ -314,6 +315,7 @@ export const weeks: Week[] = [
     d("owsianka-nocna", "paprykowa", "kinder-bueno", "gyros-bowl"),
     d("muffinki-jajeczne", "krem-brokulowy", "stracciatella", "pieczen-indyk"),
   ] },
+  ...additionalWeeks,
 ];
 
 export const dayNames = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];

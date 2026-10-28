@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Clock } from "lucide-react";
 import type { Recipe } from "@/data/recipes";
-import { computeMacros } from "@/lib/meals";
+import { portionMacros } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
 import { RecipeReview, ReviewSummary } from './RecipeReview';
 import { RecipePhotoThumbnail } from './RecipePhotos';
 
-export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: string; label?: string }) {
-  const m = computeMacros(recipe.ingredients);
+export function MealCard({ recipe, time, label, portion = 1 }: { recipe: Recipe; time?: string; label?: string; portion?: number }) {
+  const m = portionMacros(recipe, portion);
   const { isFav, toggle } = useFavorites();
   const fav = isFav(recipe.id);
   return (
@@ -18,7 +18,7 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
           <span className="text-sm font-semibold text-primary">{time}</span>
         </div>
       )}
-      <Link to="/przepis/$id" params={{ id: recipe.id }} className="min-w-0 flex-1 after:absolute after:inset-0">
+      <Link to="/przepis/$id" params={{ id: recipe.id }} search={{ porcje: portion }} className="min-w-0 flex-1 after:absolute after:inset-0">
         {label && <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>}
         <h3 className="mt-0.5 text-base font-semibold leading-snug">{recipe.name}</h3>
         <RecipePhotoThumbnail recipeId={recipe.id}/>
@@ -27,6 +27,8 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
           <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{recipe.minutes} min</span>
           <span>~{m.kcal} kcal{m.missing.length ? "*" : ""}</span>
           <span>B {m.p} g</span>
+          <span>T {m.f} g · W {m.c} g</span>
+          {time && <span>{portion.toLocaleString('pl')} × porcja · wartości szacunkowe</span>}
           {recipe.rawWeights && <span>makro szacunkowe</span>}
           {recipe.collection && <span>{recipe.collection}</span>}
           {recipeEquipment(recipe).map(id=><span key={id}>{equipmentLabels[id]}</span>)}
@@ -47,4 +49,4 @@ export function MealCard({ recipe, time, label }: { recipe: Recipe; time?: strin
   );
 }
 
-export const weekBg: Record<number, string> = { 1: "bg-week-1", 2: "bg-week-2", 3: "bg-week-3", 4: "bg-week-4" };
+export const weekBg: Record<number, string> = { 1: "bg-week-1", 2: "bg-week-2", 3: "bg-week-3", 4: "bg-week-4", 5: "bg-week-5", 6: "bg-week-6" };
