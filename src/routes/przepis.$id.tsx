@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useLocalData } from "@/lib/local-data";
 import { copyOriginal, type CustomRecipe } from "@/lib/custom-data";
 import { useState } from "react";
-import { recipeById } from "@/data/recipes";
+import { recipeById, type Recipe } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
 import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems, portionMacros } from "@/lib/meals";
