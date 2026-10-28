@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import type { LocalData } from '@/lib/custom-data';
 
 export function ReviewSummary({id}:{id:string}){const {data}=useLocalData();const r=data.reviews?.[id];return r?<span className="mt-2 block text-xs text-muted-foreground">{r.rating?`★ ${r.rating}/5 · `:''}{r.cooked?`Sprawdzone · ${r.cooked}`:r.note?'Prywatna notatka':''}</span>:null;}

@@ -4,7 +4,7 @@ import { Plus, Trash2, ShoppingBasket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ingredients } from '@/data/ingredients';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { fridgeRanking, recipeViews, ingredientKey } from '@/lib/recipe-tools';
 import type { CustomIngredient } from '@/lib/custom-data';
 import { pageHead } from '@/lib/page-head';

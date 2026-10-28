@@ -3,7 +3,7 @@ import { ChevronLeft, ShoppingBasket, Pencil } from "lucide-react";
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { PlanNutrition } from '@/components/PlanNutrition';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { copyWeek } from '@/lib/custom-data';
 import { z } from "zod";
 import { weeks, dayNames, dayShort, mealSlots, recipeById } from "@/data/recipes";

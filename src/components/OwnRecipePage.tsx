@@ -3,7 +3,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { Copy, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RecipeEditor } from './RecipeEditor';
-import { useLocalData } from '@/lib/local-data';
+import { useLocalData } from '@/lib/local-data-context';
 import { deleteRecipe, newId, type CustomRecipe } from '@/lib/custom-data';
 import { toast } from 'sonner';
 import { RecipeReview, ReviewSummary } from './RecipeReview';
