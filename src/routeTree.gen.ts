@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DaneRouteImport } from './routes/dane'
+import { Route as DodatkoweZakupyRouteImport } from './routes/dodatkowe-zakupy'
+import { Route as GeneratorRouteImport } from './routes/generator'
+import { Route as LodowkaRouteImport } from './routes/lodowka'
 import { Route as MojeTygodnieRouteImport } from './routes/moje-tygodnie'
 import { Route as SzukajRouteImport } from './routes/szukaj'
 import { Route as UlubioneRouteImport } from './routes/ulubione'
@@ -29,6 +32,21 @@ const IndexRoute = IndexRouteImport.update({
 const DaneRoute = DaneRouteImport.update({
   id: '/dane',
   path: '/dane',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DodatkoweZakupyRoute = DodatkoweZakupyRouteImport.update({
+  id: '/dodatkowe-zakupy',
+  path: '/dodatkowe-zakupy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeneratorRoute = GeneratorRouteImport.update({
+  id: '/generator',
+  path: '/generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LodowkaRoute = LodowkaRouteImport.update({
+  id: '/lodowka',
+  path: '/lodowka',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MojeTygodnieRoute = MojeTygodnieRouteImport.update({
@@ -80,6 +98,9 @@ const ZakupyNRoute = ZakupyNRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dane': typeof DaneRoute
+  '/dodatkowe-zakupy': typeof DodatkoweZakupyRoute
+  '/generator': typeof GeneratorRoute
+  '/lodowka': typeof LodowkaRoute
   '/moje-tygodnie': typeof MojeTygodnieRoute
   '/szukaj': typeof SzukajRoute
   '/ulubione': typeof UlubioneRoute
@@ -93,6 +114,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dane': typeof DaneRoute
+  '/dodatkowe-zakupy': typeof DodatkoweZakupyRoute
+  '/generator': typeof GeneratorRoute
+  '/lodowka': typeof LodowkaRoute
   '/moje-tygodnie': typeof MojeTygodnieRoute
   '/szukaj': typeof SzukajRoute
   '/ulubione': typeof UlubioneRoute
@@ -107,6 +131,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dane': typeof DaneRoute
+  '/dodatkowe-zakupy': typeof DodatkoweZakupyRoute
+  '/generator': typeof GeneratorRoute
+  '/lodowka': typeof LodowkaRoute
   '/moje-tygodnie': typeof MojeTygodnieRoute
   '/szukaj': typeof SzukajRoute
   '/ulubione': typeof UlubioneRoute
@@ -122,6 +149,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dane'
+    | '/dodatkowe-zakupy'
+    | '/generator'
+    | '/lodowka'
     | '/moje-tygodnie'
     | '/szukaj'
     | '/ulubione'
@@ -135,6 +165,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dane'
+    | '/dodatkowe-zakupy'
+    | '/generator'
+    | '/lodowka'
     | '/moje-tygodnie'
     | '/szukaj'
     | '/ulubione'
@@ -148,6 +181,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dane'
+    | '/dodatkowe-zakupy'
+    | '/generator'
+    | '/lodowka'
     | '/moje-tygodnie'
     | '/szukaj'
     | '/ulubione'
@@ -162,6 +198,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DaneRoute: typeof DaneRoute
+  DodatkoweZakupyRoute: typeof DodatkoweZakupyRoute
+  GeneratorRoute: typeof GeneratorRoute
+  LodowkaRoute: typeof LodowkaRoute
   MojeTygodnieRoute: typeof MojeTygodnieRoute
   SzukajRoute: typeof SzukajRoute
   UlubioneRoute: typeof UlubioneRoute
@@ -187,6 +226,27 @@ declare module '@tanstack/react-router' {
       path: '/dane'
       fullPath: '/dane'
       preLoaderRoute: typeof DaneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dodatkowe-zakupy': {
+      id: '/dodatkowe-zakupy'
+      path: '/dodatkowe-zakupy'
+      fullPath: '/dodatkowe-zakupy'
+      preLoaderRoute: typeof DodatkoweZakupyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generator': {
+      id: '/generator'
+      path: '/generator'
+      fullPath: '/generator'
+      preLoaderRoute: typeof GeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lodowka': {
+      id: '/lodowka'
+      path: '/lodowka'
+      fullPath: '/lodowka'
+      preLoaderRoute: typeof LodowkaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moje-tygodnie': {
@@ -258,6 +318,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DaneRoute: DaneRoute,
+  DodatkoweZakupyRoute: DodatkoweZakupyRoute,
+  GeneratorRoute: GeneratorRoute,
+  LodowkaRoute: LodowkaRoute,
   MojeTygodnieRoute: MojeTygodnieRoute,
   SzukajRoute: SzukajRoute,
   UlubioneRoute: UlubioneRoute,
