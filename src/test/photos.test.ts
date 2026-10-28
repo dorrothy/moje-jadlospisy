@@ -1,0 +1,11 @@
+import {describe,it,expect} from 'vitest';
+import {resizedDimensions,MAX_PHOTOS,MAX_IMAGE_EDGE,MAX_INPUT_BYTES,MAX_BACKUP_BYTES,base64Photo,compressImage} from '@/lib/photos';
+import {photoBackupSchema} from '@/lib/photo-backup';
+import {emptyData,parseImport,mergeImport,copyOriginal} from '@/lib/custom-data';
+describe('local photo constraints',()=>{
+ it('resizes to at most 1600 px without upscaling or changing aspect ratio',()=>{expect(MAX_IMAGE_EDGE).toBe(1600);expect(resizedDimensions(4000,3000)).toEqual({width:1600,height:1200});expect(resizedDimensions(900,1800)).toEqual({width:800,height:1600});expect(resizedDimensions(300,200)).toEqual({width:300,height:200});expect(()=>resizedDimensions(0,1)).toThrow();});
+ it('limits galleries to one main and four additional images',()=>{expect(MAX_PHOTOS).toBe(5);});
+ it('uses explicit input/backup limits and rejects oversized or active image inputs',async()=>{expect(MAX_INPUT_BYTES).toBe(25*1024*1024);expect(MAX_BACKUP_BYTES).toBe(100*1024*1024);await expect(compressImage(new Blob([new Uint8Array(MAX_INPUT_BYTES+1)],{type:'image/jpeg'}))).rejects.toThrow();await expect(compressImage(new Blob(['<svg/>'],{type:'image/svg+xml'}))).rejects.toThrow();});
+ it('rejects malformed base64 and versioned image envelopes',()=>{expect(()=>base64Photo('not a valid image@')).toThrow();expect(()=>photoBackupSchema.parse({format:'moje-przepisy-photos',version:2,data:emptyData,photos:[]})).toThrow();expect(()=>photoBackupSchema.parse({format:'moje-przepisy-photos',version:1,data:emptyData,photos:[{recipeId:'x',image:'',order:-1}]})).toThrow();});
+ it('keeps existing JSON imports unchanged and shares stable ID remapping for photos',()=>{expect(parseImport(JSON.stringify(emptyData))).toEqual(emptyData);const recipe=copyOriginal('polskie-schabowy');if(!recipe)throw new Error('recipe');const d={...emptyData,recipes:[recipe]};const map=new Map<string,string>();const merged=mergeImport(d,d,map);expect(map.get(recipe.id)).toBe(merged.recipes[1]?.id);expect(map.get(recipe.id)).not.toBe(recipe.id);});
+});
