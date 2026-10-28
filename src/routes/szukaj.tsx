@@ -12,7 +12,7 @@ import { searchRecipes, typeLabel } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import type { MealType } from "@/data/recipes";
 import { equipmentLabels, recipeEquipment, type Equipment } from '@/data/equipment';
-import { recipes } from '@/data/recipes';
+import { recipes, weeks } from '@/data/recipes';
 import { reviewMatches, reviewSort } from '@/lib/reviews';
 
 export const Route = createFileRoute("/szukaj")({
@@ -72,7 +72,7 @@ export function RecipeBrowser({ favOnly = false }: { favOnly?: boolean }) {
       </label>
       <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
         <Chip active={!week} onClick={() => setWeek(undefined)}>Wszystkie</Chip>
-        {[1, 2, 3, 4].map((w) => <Chip key={w} active={week === w} onClick={() => setWeek(week === w ? undefined : w)}>Tydz. {w}</Chip>)}
+        {weeks.map(({n:w}) => <Chip key={w} active={week === w} onClick={() => setWeek(week === w ? undefined : w)}>Tydz. {w}</Chip>)}
       </div>
       <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
         {(Object.keys(typeLabel) as MealType[]).map((t) => <Chip key={t} active={type === t} onClick={() => setType(type === t ? undefined : t)}>{typeLabel[t]}</Chip>)}

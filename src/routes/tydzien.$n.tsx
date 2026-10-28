@@ -1,9 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ChevronLeft, ShoppingBasket } from "lucide-react";
+import { ChevronLeft, ShoppingBasket, Pencil } from "lucide-react";
+import { useNavigate } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
+import { PlanNutrition } from '@/components/PlanNutrition';
+import { useLocalData } from '@/lib/local-data';
+import { copyWeek } from '@/lib/custom-data';
 import { z } from "zod";
 import { weeks, dayNames, dayShort, mealSlots, recipeById } from "@/data/recipes";
 import { MealCard, weekBg } from "@/components/MealCard";
-import { computeMacros } from "@/lib/meals";
+import { weekDayMacros } from "@/lib/meals";
 
 export const Route = createFileRoute("/tydzien/$n")({
   validateSearch: z.object({ dzien: z.number().int().min(0).max(6).optional() }),
@@ -30,18 +35,16 @@ export const Route = createFileRoute("/tydzien/$n")({
 
 function WeekPage() {
   const { week } = Route.useLoaderData();
+  const { data, update, ready } = useLocalData();
+  const navigate = useNavigate();
   const { dzien = 0 } = Route.useSearch();
   const day = week.days[dzien] ?? week.days[0];
   if (!day) return null;
-  const total = mealSlots.reduce(
-    (acc, s) => {
-      const recipe = recipeById[day[s.type]];
-      if (!recipe) return acc;
-      const m = computeMacros(recipe.ingredients);
-      return { kcal: acc.kcal + m.kcal, p: acc.p + m.p, miss: acc.miss || m.missing.length > 0 };
-    },
-    { kcal: 0, p: 0, miss: false },
-  );
+  const days = week.days.map((_, i) => weekDayMacros(week, i));
+  const edit = () => {
+    const copy = data.weeks.find(w=>w.name===`${week.title} (moja wersja)`) ?? copyWeek(week);
+    if (data.weeks.some(w=>w.id===copy.id) || update(d=>({...d,weeks:[...d.weeks,copy]}))) void navigate({to:'/moj-tydzien/$id',params:{id:copy.id}});
+  };
 
   return (
     <main>
@@ -56,6 +59,7 @@ function WeekPage() {
         </div>
         <p className="mt-3 text-xs font-medium uppercase tracking-wider text-foreground/60">Tydzień {week.n} {week.emoji}</p>
         <h1 className="text-3xl font-bold">{week.title}</h1>
+        <Button variant="secondary" size="sm" disabled={!ready} className="mt-3" onClick={edit}><Pencil/>Edytuj swoją kopię</Button>
 
         <div className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
           {dayShort.map((d, i) => (
@@ -77,14 +81,12 @@ function WeekPage() {
       </header>
 
       <section className="px-4 pt-5">
-        <div className="flex items-baseline justify-between">
+        <div>
           <h2 className="text-xl font-bold">{dayNames[dzien]}</h2>
-          <p className="text-xs text-muted-foreground">
-            ~{total.kcal} kcal{total.miss ? "*" : ""} · B {Math.round(total.p)} g · szacunkowo
-          </p>
+          <PlanNutrition days={days} selected={dzien} checkGoal={week.n>=5}/>
         </div>
         <div className="mt-3 space-y-3">
-          {mealSlots.map((s) => { const recipe = recipeById[day[s.type]]; return recipe ? <MealCard key={s.type} recipe={recipe} time={s.time} label={s.label} /> : null; })}
+          {mealSlots.map((s) => { const recipe = recipeById[day[s.type]]; return recipe ? <MealCard key={s.type} recipe={recipe} time={s.time} label={s.label} portion={week.portions?.[dzien]?.[s.type] ?? 1} /> : null; })}
         </div>
       </section>
     </main>

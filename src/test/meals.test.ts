@@ -4,7 +4,7 @@ import { recipeById, weeks } from "@/data/recipes";
 
 describe("meals", () => {
   it("every week has 7 days with 4 existing recipes", () => {
-    expect(weeks).toHaveLength(4);
+    expect(weeks).toHaveLength(6);
     for (const w of weeks) {
       expect(w.days).toHaveLength(7);
       for (const d of w.days) for (const id of Object.values(d)) expect(recipeById[id]).toBeDefined();

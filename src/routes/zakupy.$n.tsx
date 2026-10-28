@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Check, Minus, Plus, RotateCcw } from "lucide-react";
 import { useLocalData } from "@/lib/local-data";
 import { weeks } from "@/data/recipes";
-import { shoppingList, formatGrams } from "@/lib/meals";
+import { shoppingList, formatItemAmount } from "@/lib/meals";
 import { useStored } from "@/lib/storage";
 import { Chip } from "./szukaj";
 
@@ -79,7 +79,7 @@ function ShoppingPage() {
                   <div className={`min-w-0 flex-1 ${on ? "opacity-50" : ""}`}>
                     <div className="flex justify-between gap-2">
                       <span className={`font-medium ${on ? "line-through" : ""}`}>{r.name}</span>
-                      <span className="shrink-0 font-semibold tabular-nums">{formatGrams(r.grams)}</span>
+                      <span className="shrink-0 font-semibold tabular-nums">{formatItemAmount(r.id,r.grams)}</span>
                     </div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {r.recipes.map((rec) => (

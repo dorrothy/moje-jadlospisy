@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useLocalData } from "@/lib/local-data";
-import { newId, weekBgClass, weekEmoji, type WeekColor } from "@/lib/custom-data";
+import { copyWeek, weekBgClass, weekEmoji } from "@/lib/custom-data";
 import { Pencil, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,9 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { title: "Let's cook — jadłospis i przepisy" },
-      { name: "description", content: "4 tygodnie jadłospisów: low-carb, zupy i konjac, azjatyckie kolacje, meal prep. Przepisy, makro i lista zakupów." },
+      { name: "description", content: "6 gotowych tygodni jadłospisów, własne plany, przepisy, szacunkowe makro i listy zakupów." },
       { property: "og:title", content: "Let's cook — jadłospis i przepisy" },
-      { property: "og:description", content: "Przepisy z gramaturami, makro i lista zakupów na 4 tygodnie." },
+      { property: "og:description", content: "Przepisy z gramaturami, szacunkowe makro i listy zakupów na 6 tygodni." },
     ],
   }),
   component: Index,
@@ -40,14 +40,14 @@ function Index() {
     setHeroOpen(false);
   };
   const editOriginal = (n: number) => {
-    const w = weeks.find((x) => x.n === n)!;
+    const w = weeks.find((x) => x.n === n);
+    if (!w) return;
     const name = `${w.title} (moja wersja)`;
     const existing = data.weeks.find((x) => x.name === name);
     if (existing) { void navigate({ to: "/moj-tydzien/$id", params: { id: existing.id } }); return; }
-    const id = newId("week");
-    const color = `week-${n}` as WeekColor;
-    if (update((d) => ({ ...d, weeks: [...d.weeks, { id, name, emoji: w.emoji, color, days: w.days.map((day) => ({ ...day })) }] })))
-      navigate({ to: "/moj-tydzien/$id", params: { id } });
+    const copy = copyWeek(w);
+    if (update((d) => ({ ...d, weeks: [...d.weeks, copy] })))
+      void navigate({ to: "/moj-tydzien/$id", params: { id:copy.id } });
   };
   return (
     <main className="px-4 pt-6">

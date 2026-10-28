@@ -1,4 +1,9 @@
 # Zadania
+- [x] Dodać tygodnie 5 „Świeżo i kolorowo” i 6 „Azja i Włochy” bez zmian poprzednich planów
+- [x] Dopasować rzeczywiste porcje i sprawdzić 14 dni: 1700–1800 kcal, 120–145 g białka
+- [x] Pokazać pełne makro posiłków, dni i średnie; zachować porcje w kopiach, zakupach i backupie
+- [x] Sprawdzić nowe tygodnie i zamianę posiłku na telefonie
+Tygodnie 5/6: 172 testy przeszły. Wszystkie 14 dni w widełkach, pełne dane składników; średnie 1760 kcal / B 131 g oraz 1764 kcal / B 126,9 g. Chromium 390×844: 14 dni, skalowany przepis, kopia i zamiana z resetem porcji, reload, zakupy, eksport/import do drugiej przeglądarki. 1280×1800 bez przepełnienia, brak błędów przeglądarki. Konfiguracja statycznego hostowania/PWA zachowana; publikacji i offline na fizycznym iPhonie nie uruchamiano.
 - [x] Dodać 24 przepisy: Sałatki 6, Deserki 8, Azjatyckie 5, Włoskie 5
 - [x] Osobne makro gnocchi z kurczakiem i większe porcje dań głównych
 - [x] Sprawdzić kolekcje, generator, zakupy i zachowanie istniejących danych
