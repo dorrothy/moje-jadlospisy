@@ -1,4 +1,9 @@
 # Zadania
+- [x] 28 przepisów: Ryby 6, Owsianki 7, Shake'i 6, Ciasteczka 5, Pieczywo 4 (kolekcje wypieki-*, yield dla partii)
+- [x] Ciasteczka/pieczywo: gramatury za sztukę/kromkę, makro partii i 100 g liczone z składników, zakupy skalują się bez całego bochenka
+- [x] Wskazówki przechowywania dla ryb i pieczywa, wariant z odżywką dla shake'ów, porcje chłopaka dla ryb
+- [x] Testy 1 vs 2 kromki i 1 vs 3 ciastek, integracja z planerem; 181 testów przechodzi, build OK
+Weryfikacja przeglądarką (390×844): strona chleba pokazuje partię 14 kromek/630 g i makro na 100 g, skalowanie 1,5 kromki → 44 g mąki i 3,25 szt. → 24 g płatków, nowe kolekcje w filtrach i wyszukiwarce, generator działa, brak błędów strony.
 - [x] Dodać tygodnie 5 „Świeżo i kolorowo” i 6 „Azja i Włochy” bez zmian poprzednich planów
 - [x] Dopasować rzeczywiste porcje i sprawdzić 14 dni: 1700–1800 kcal, 120–145 g białka
 - [x] Pokazać pełne makro posiłków, dni i średnie; zachować porcje w kopiach, zakupach i backupie

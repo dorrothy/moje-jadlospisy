@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { useLocalData } from "@/lib/local-data";
 import { copyOriginal, type CustomRecipe } from "@/lib/custom-data";
 import { useState } from "react";
-import { recipeById } from "@/data/recipes";
+import { recipeById, type Recipe } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
-import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems } from "@/lib/meals";
+import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems, portionMacros } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import { RecipeReview, ReviewSummary } from '@/components/RecipeReview';
 import { RecipePhotos } from '@/components/RecipePhotos';
@@ -100,7 +100,7 @@ function OriginalRecipePage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground">
-          Wartości szacunkowe: {forHim ? '1 większa porcja chłopaka' : `${servings.toLocaleString('pl')} × porcja bazowa`}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
+          Wartości szacunkowe: {forHim ? '1 większa porcja chłopaka' : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja bazowa'}`}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
         </p>
         {recipe.rawWeights && <p className="mt-2 text-xs text-muted-foreground">Masy przed obróbką: jajka bez skorupki, owoce i warzywa bez niejadalnych części, konserwy odsączone. Ryż i makaron ważone na sucho. Drobne przyprawy bez gramatur nie są wliczone.</p>}
         {shown.missing.length > 0 && (
@@ -110,6 +110,8 @@ function OriginalRecipePage() {
         )}
       </header>
       <RecipePhotos recipeId={recipe.id}/>
+      {recipe.yield && <YieldInfo recipe={recipe} />}
+
 
       {recipe.proteinVariant && <label className="mt-4 flex items-start gap-3 rounded-lg border bg-card p-4 text-sm"><input type="checkbox" checked={protein} onChange={e=>setProtein(e.target.checked)} className="mt-1"/><span><strong className="block">Wariant wysokobiałkowy: kurczak 120 g</strong>{recipe.proteinVariant.note}<span className="mt-2 block text-muted-foreground">Aby zaplanować ten wariant i uwzględnić go w zakupach, wybierz „Duplikuj jako własny” po zaznaczeniu opcji.</span></span></label>}
       {recipe.partner && (
@@ -133,7 +135,7 @@ function OriginalRecipePage() {
           <h2 className="text-xl font-bold">Składniki</h2>
           <div className="flex items-center gap-2 rounded-full bg-card p-1 shadow-soft">
             <Button size="icon" variant="ghost" disabled={forHim} aria-label="Mniej porcji" onClick={() => setServings((s) => Math.max(.75, s - .25))}><Minus className="h-4 w-4" /></Button>
-            <span className="min-w-16 text-center text-sm font-medium">{forHim ? '1 większa porcja' : `${servings.toLocaleString('pl')} × porcja`}</span>
+            <span className="min-w-16 text-center text-sm font-medium">{forHim ? '1 większa porcja' : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja'}`}</span>
             <Button size="icon" variant="ghost" disabled={forHim} aria-label="Więcej porcji" onClick={() => setServings((s) => Math.min(20, s + .25))}><Plus className="h-4 w-4" /></Button>
           </div>
         </div>
@@ -172,11 +174,26 @@ function OriginalRecipePage() {
           {recipe.steps.map((s, i) => (
             <li key={i} className="flex gap-3 rounded-2xl bg-card p-4">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{i + 1}</span>
-              <p className="pt-0.5 text-[15px] leading-relaxed">{s}</p>
+          <p className="pt-0.5 text-[15px] leading-relaxed">{s}</p>
             </li>
           ))}
         </ol>
       </section>
     </main>
+  );
+}
+
+function YieldInfo({ recipe }: { recipe: Recipe }) {
+  const y = recipe.yield!;
+  const batch = portionMacros(recipe, y.count);
+  const per100 = y.bakedGrams ? { kcal: Math.round(batch.kcal / y.bakedGrams * 100), p: Math.round(batch.p / y.bakedGrams * 1000) / 10, f: Math.round(batch.f / y.bakedGrams * 1000) / 10, c: Math.round(batch.c / y.bakedGrams * 1000) / 10 } : null;
+  return (
+    <section className="mt-3 rounded-2xl border bg-card p-4 text-sm">
+      <h2 className="font-bold">Cała partia: {y.count} {y.unit}{y.bakedGrams ? ` · ok. ${y.bakedGrams} g po wypieku` : ""}</h2>
+      <p className="mt-1 text-muted-foreground">Składniki poniżej są za 1 {y.unit} — w planie i zakupach 1 porcja = 1 {y.unit}, nigdy cała partia.</p>
+      <p className="mt-2">Partia ({y.count} {y.unit}): <strong>{batch.kcal} kcal</strong> · B {batch.p} g · T {batch.f} g · W {batch.c} g</p>
+      {per100 && <p className="mt-1">Na 100 g wypieku: <strong>{per100.kcal} kcal</strong> · B {per100.p} g · T {per100.f} g · W {per100.c} g</p>}
+      <p className="mt-2 text-[11px] text-muted-foreground">Wartości szacunkowe, liczone z tabeli składników przed pieczeniem.</p>
+    </section>
   );
 }

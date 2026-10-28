@@ -23,3 +23,7 @@
 - Extend the v1 local overlay with optional validated reviews, pantry and extra shopping fields so old backups remain byte-shape compatible; remap imported custom review keys and merge conflicts without replacing existing notes or ratings.
 - Store recipe photos in a separate IndexedDB Blob store keyed by stable recipe IDs; decode and resize in browser handlers, use revocable object URLs, and keep media out of localStorage and the repository.
 - Photo backups use a versioned JSON envelope with base64 images only for transfer; validate/recompress before transactional IndexedDB import and remap photo recipe IDs through the same additive data merge.
+
+## Pieczywo i ciasteczka (kolekcje Ryby/Owsianki/Shake'i/Ciasteczka/Pieczywo)
+- `recipes-baking.ts`: ciasteczka i pieczywo trzymają gramatury za JEDNĄ sztukę/kromkę, a `Recipe.yield {count, unit, bakedGrams?}` opisuje całą partię — dzięki temu porcja 1 w planie i zakupach nigdy nie jest całym bochenkiem.
+- Makro partii i na 100 g liczone zawsze z tych samych składników przez `portionMacros(recipe, yield.count)`, nigdy wpisywane ręcznie.
