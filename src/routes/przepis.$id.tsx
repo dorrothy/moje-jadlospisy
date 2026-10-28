@@ -62,6 +62,7 @@ function OriginalRecipePage() {
   const [kcalTarget, setKcalTarget] = useState('');
   const [protein, setProtein] = useState(false);
   if (!recipe) return null;
+  const baseKcal = computeMacros(recipeItems(recipe,false,protein)).kcal;
   const m = computeMacros(recipeItems(recipe,false,protein).map(([id,g])=>[id,g*servings]));
   const partnerM = recipe.partner ? computeMacros(recipeItems(recipe, true, protein)) : null;
   const shown = forHim && partnerM ? partnerM : m;
