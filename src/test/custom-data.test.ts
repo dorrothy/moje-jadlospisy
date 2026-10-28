@@ -1,6 +1,7 @@
 import { describe,it,expect } from 'vitest';
 import { blankWeek,customShopping,deleteRecipe,parseImport,mergeImport,matchesCustom,emptyData,weekBgClass,weekEmoji,type CustomRecipe } from '@/lib/custom-data';
-import { mealSlots } from '@/data/recipes';
+import { mealSlots, recipes } from '@/data/recipes';
+import { portionMacros, portionItems } from '@/lib/meals';
 const r:CustomRecipe={id:'own-test',name:'Łosoś domowy',category:'Własne',type:'obiad',minutes:10,servings:2,ingredients:[{name:'Cukier',amount:200,unit:'g'},{name:'cukier',amount:0.1,unit:'kg'},{name:'Mleko',amount:100,unit:'ml'}],steps:['Gotuj'],macros:{kcal:123,p:12,f:3,c:4}};
 function at<T>(items:T[], index=0):T { const item=items[index]; if(item===undefined) throw new Error('Missing test item'); return item; }
 describe('local recipes and weeks',()=>{
