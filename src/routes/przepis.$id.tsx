@@ -9,7 +9,7 @@ import { useState } from "react";
 import { recipeById } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
-import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems } from "@/lib/meals";
+import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems, portionMacros } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import { RecipeReview, ReviewSummary } from '@/components/RecipeReview';
 import { RecipePhotos } from '@/components/RecipePhotos';
@@ -110,6 +110,8 @@ function OriginalRecipePage() {
         )}
       </header>
       <RecipePhotos recipeId={recipe.id}/>
+      {recipe.yield && <YieldInfo recipe={recipe} />}
+
 
       {recipe.proteinVariant && <label className="mt-4 flex items-start gap-3 rounded-lg border bg-card p-4 text-sm"><input type="checkbox" checked={protein} onChange={e=>setProtein(e.target.checked)} className="mt-1"/><span><strong className="block">Wariant wysokobiałkowy: kurczak 120 g</strong>{recipe.proteinVariant.note}<span className="mt-2 block text-muted-foreground">Aby zaplanować ten wariant i uwzględnić go w zakupach, wybierz „Duplikuj jako własny” po zaznaczeniu opcji.</span></span></label>}
       {recipe.partner && (
