@@ -25,9 +25,9 @@ export const mealSlots: { type: MealType; time: string; label: string }[] = [
   { type: "kolacja", time: "18:00", label: "Kolacja" },
 ];
 
-const rice = (g = 80): Recipe["partner"] => ({ note: `Dla chłopaka: dodatkowa porcja ryżu (${g} g suchego), ten sam sos.`, extra: [["ryz", g]] });
-const pasta = (g = 90): Recipe["partner"] => ({ note: `Dla chłopaka: zamiast konjac makaron pszenny (${g} g suchego), wspólny sos.`, extra: [["makaron", g]] });
-const potato = (g = 250): Recipe["partner"] => ({ note: `Dla chłopaka: ${g} g gotowanych ziemniaków do tej samej porcji.`, extra: [["ziemniak", g]] });
+const rice = (g = 80): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopaka: dodatkowa porcja ryżu (${g} g suchego), ten sam sos.`, extra: [["ryz", g]] });
+const pasta = (g = 90): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopaka: zamiast konjac makaron pszenny (${g} g suchego), wspólny sos.`, extra: [["makaron", g]] });
+const potato = (g = 250): NonNullable<Recipe["partner"]> => ({ note: `Dla chłopaka: ${g} g gotowanych ziemniaków do tej samej porcji.`, extra: [["ziemniak", g]] });
 
 export const recipes: Recipe[] = [
   // ───────── ŚNIADANIA ─────────
