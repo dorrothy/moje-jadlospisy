@@ -36,6 +36,8 @@
   --color-week-2: var(--week-2);
   --color-week-3: var(--week-3);
   --color-week-4: var(--week-4);
+  --color-week-5: var(--week-5);
+  --color-week-6: var(--week-6);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
 }
