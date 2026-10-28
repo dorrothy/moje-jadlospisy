@@ -103,7 +103,7 @@ export function searchRecipes(q: string, opts: { week?: number | undefined; type
     if (opts.week && !weeksOfRecipe(r.id).includes(opts.week)) return false;
     if (opts.favs && !opts.favs.includes(r.id)) return false;
     if (!nq) return true;
-    const hay = normalize([r.name, r.category, r.collection ?? '', r.spices ?? "", ...r.ingredients.map(([id]) => ingredients[id].name)].join(" "));
+    const hay = normalize([r.name, r.category, r.collection ?? '', ...(r.tags ?? []), r.spices ?? "", ...r.ingredients.map(([id]) => ingredients[id].name)].join(" "));
     return nq.split(/\s+/).every((t) => hay.includes(t));
   });
 }

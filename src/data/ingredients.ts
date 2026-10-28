@@ -6,6 +6,7 @@ import { newNutrition } from './nutrition-new';
 import { polishNutrition } from './nutrition-polish';
 import { collectionNutrition } from './nutrition-collections';
 import { bakingNutrition } from './nutrition-baking';
+import { extraNutrition } from './nutrition-extra';
 
 export type Ingredient = {
   name: string;
@@ -18,6 +19,7 @@ export type Ingredient = {
 };
 
 export const ingredients = {
+  ...extraNutrition,
   ...bakingNutrition,
   ...collectionNutrition,
   ...polishNutrition,
