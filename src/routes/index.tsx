@@ -31,7 +31,7 @@ function Index() {
   const { data, update, ready } = useLocalData();
   const navigate = useNavigate();
   const [heroOpen, setHeroOpen] = useState(false);
-  const hero = data.hero ?? defaultHero;
+  const hero = { eyebrow: data.hero?.eyebrow ?? defaultHero.eyebrow, title: data.hero?.title ?? defaultHero.title, subtitle: data.hero?.subtitle ?? defaultHero.subtitle };
   const saveHero = (next: { eyebrow: string; title: string; subtitle: string }) => {
     const trimmed = { eyebrow: next.eyebrow.trim(), title: next.title.trim(), subtitle: next.subtitle.trim() };
     const isDefault =
