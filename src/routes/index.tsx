@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { weeks } from "@/data/recipes";
 import { weekBg } from "@/components/MealCard";
@@ -6,9 +7,11 @@ import { weekBg } from "@/components/MealCard";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Moje 4 tygodnie — jadłospis i przepisy" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Moje przepisy — jadłospis i przepisy" },
       { name: "description", content: "4 tygodnie jadłospisów: low-carb, zupy i konjac, azjatyckie kolacje, meal prep. Przepisy, makro i lista zakupów." },
-      { property: "og:title", content: "Moje 4 tygodnie — jadłospis i przepisy" },
+      { property: "og:title", content: "Moje przepisy — jadłospis i przepisy" },
       { property: "og:description", content: "Przepisy z gramaturami, makro i lista zakupów na 4 tygodnie." },
     ],
   }),
@@ -20,13 +23,20 @@ function Index() {
     <main className="px-4 pt-6">
       <header className="bg-hero rounded-3xl p-6 shadow-soft">
         <p className="text-sm font-medium text-accent-foreground">Twój plan posiłków</p>
-        <h1 className="mt-1 text-4xl font-bold">Moje 4 tygodnie</h1>
+        <h1 className="mt-1 text-4xl font-bold">Moje przepisy</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           4 posiłki dziennie · 10:00 · 13:00 · 16:00 · 18:00
         </p>
       </header>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button asChild><Link to="/szukaj">Moje przepisy</Link></Button>
+        <Button asChild variant="secondary"><Link to="/moje-tygodnie">Moje tygodnie</Link></Button>
+        <Button asChild variant="outline"><Link to="/dane">Kopia danych</Link></Button>
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">Własne dane są lokalne, zapisane tylko na tym urządzeniu.</p>
+      <h2 className="mt-6 text-xl">Oryginalne jadłospisy</h2>
+      <div className="mt-3 grid grid-cols-2 gap-3">
         {weeks.map((w) => (
           <Link
             key={w.n}

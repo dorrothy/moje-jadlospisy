@@ -4,7 +4,9 @@ import { RecipeBrowser } from "./szukaj";
 export const Route = createFileRoute("/ulubione")({
   head: () => ({
     meta: [
-      { title: "Ulubione przepisy — Moje 4 tygodnie" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Ulubione przepisy — Moje przepisy" },
       { name: "description", content: "Twoje ulubione przepisy zapisane na tym urządzeniu." },
       { property: "og:title", content: "Ulubione przepisy" },
       { property: "og:description", content: "Ulubione przepisy z planu 4 tygodni." },
