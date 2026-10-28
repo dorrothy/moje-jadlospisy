@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Check, ChefHat, ChevronDown, ListChecks, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-export type CookingItem = { name: string; amount: string };
+import type { CookingItem } from '@/lib/cooking';
 
 // Full-screen cooking mode: ingredient list stays on top, steps below, screen kept awake while open.
 export function CookingMode({ name, steps, ingredients, note, onClose }: {
