@@ -24,8 +24,8 @@ describe('local recipes and weeks',()=>{
    const servings=Math.min(20,Math.max(.75,Math.round((target/base.kcal)*4)/4));
    const scaled=portionMacros(recipe,servings);
    expect(Math.abs(scaled.kcal-target)).toBeLessThanOrEqual(Math.max(10,target*0.06));
-   const [ing,grams]=portionItems(recipe,servings)[0];
-   const [baseIng,baseGrams]=portionItems(recipe,1)[0];
+   const [ing,grams]=at(portionItems(recipe,servings));
+   const [baseIng,baseGrams]=at(portionItems(recipe,1));
    expect(ing).toBe(baseIng);
    expect(grams).toBeCloseTo(baseGrams*servings,6);
   }
