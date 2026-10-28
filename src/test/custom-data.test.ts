@@ -1,6 +1,7 @@
 import { describe,it,expect } from 'vitest';
 import { blankWeek,customShopping,deleteRecipe,parseImport,mergeImport,matchesCustom,emptyData,weekBgClass,weekEmoji,type CustomRecipe } from '@/lib/custom-data';
-import { mealSlots } from '@/data/recipes';
+import { mealSlots, recipes } from '@/data/recipes';
+import { portionMacros, portionItems } from '@/lib/meals';
 const r:CustomRecipe={id:'own-test',name:'Łosoś domowy',category:'Własne',type:'obiad',minutes:10,servings:2,ingredients:[{name:'Cukier',amount:200,unit:'g'},{name:'cukier',amount:0.1,unit:'kg'},{name:'Mleko',amount:100,unit:'ml'}],steps:['Gotuj'],macros:{kcal:123,p:12,f:3,c:4}};
 function at<T>(items:T[], index=0):T { const item=items[index]; if(item===undefined) throw new Error('Missing test item'); return item; }
 describe('local recipes and weeks',()=>{
@@ -15,4 +16,19 @@ describe('local recipes and weeks',()=>{
  it('searches own recipes without Polish accents',()=>{expect(matchesCustom(r,'losos')).toBe(true);expect(matchesCustom(r,'cukier')).toBe(true);expect(matchesCustom(r,'kurczak')).toBe(false);});
  it('stores week emoji and color and rejects an unknown color',()=>{const w={...blankWeek('T'),emoji:'🥗',color:'week-5' as const};const parsed=parseImport(JSON.stringify({...emptyData,weeks:[w]}));expect(at(parsed.weeks).emoji).toBe('🥗');expect(at(parsed.weeks).color).toBe('week-5');expect(weekBgClass(at(parsed.weeks))).toBe('bg-week-5');expect(weekEmoji(at(parsed.weeks))).toBe('🥗');expect(()=>parseImport(JSON.stringify({...emptyData,weeks:[{...w,color:'week-9' as never}]}))).toThrow();});
  it('gives weeks without emoji or color a stable default',()=>{const w=blankWeek('T');expect(weekEmoji(w)).toBe('🍽️');expect(weekBgClass(w)).toBe(weekBgClass(w));});
+ it('counts a leftover slot only once in shopping and accepts legacy weeks without the field',()=>{const w=blankWeek('Test');at(w.days).obiad=r.id;at(w.days,1).obiad=r.id;const withLeftover={...w,leftovers:Array.from({length:7},(_,i)=>i===1?{obiad:true as const}:{})};const list=customShopping(withLeftover,[r]);expect(list.find(x=>x.unit==='g')?.amount).toBe(150);expect(list.find(x=>x.unit==='ml')?.amount).toBe(50);const parsed=parseImport(JSON.stringify({...emptyData,recipes:[r],weeks:[withLeftover]}));expect(at(parsed.weeks).leftovers?.[1]?.obiad).toBe(true);expect(at(parseImport(JSON.stringify({...emptyData,recipes:[r],weeks:[w]})).weeks).leftovers).toBeUndefined();});
+ it('scales grams linearly when recalculating a portion to a target kcal',()=>{
+  const recipe=recipes.find(x=>portionMacros(x,1).kcal>300)!;
+  const base=portionMacros(recipe,1);
+  for(const target of [base.kcal,base.kcal*2]){
+   const servings=Math.min(20,Math.max(.75,Math.round((target/base.kcal)*4)/4));
+   const scaled=portionMacros(recipe,servings);
+   expect(Math.abs(scaled.kcal-target)).toBeLessThanOrEqual(Math.max(10,target*0.06));
+   const [ing,grams]=at(portionItems(recipe,servings));
+   const [baseIng,baseGrams]=at(portionItems(recipe,1));
+   expect(ing).toBe(baseIng);
+   expect(grams).toBeCloseTo(baseGrams*servings,6);
+  }
+  expect(Math.min(20,Math.max(.75,Math.round((Math.round(base.kcal/2)/base.kcal)*4)/4))).toBe(.75);
+ });
 });

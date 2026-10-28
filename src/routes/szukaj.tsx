@@ -8,7 +8,7 @@ import { Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { MealCard } from "@/components/MealCard";
-import { searchRecipes, typeLabel } from "@/lib/meals";
+import { portionMacros, searchRecipes, typeLabel } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import type { MealType } from "@/data/recipes";
 import { equipmentLabels, recipeEquipment, type Equipment } from '@/data/equipment';
@@ -49,11 +49,15 @@ export function RecipeBrowser({ favOnly = false }: { favOnly?: boolean }) {
   const [minimum,setMinimum]=useState(0);
   const [tested,setTested]=useState(false);
   const [sort,setSort]=useState('default');
+  const [kcalMin,setKcalMin]=useState('');
+  const [kcalMax,setKcalMax]=useState('');
   const { favs } = useFavorites();
   const results = searchRecipes(q, { week, type, equipment, collection, favs: onlyFav ? favs : undefined });
 
   const ownResults = data.recipes.filter(r => matchesCustom(r, q) && (!type || r.type === type) && (!equipment || recipeEquipment(r).includes(equipment)) && (!collection || r.collection === collection) && (!onlyFav || favs.includes(r.id)) && !week);
-  const merged=[...ownResults,...results].filter(r=>reviewMatches(r.id,data.reviews,minimum,tested)).sort((a,b)=>reviewSort(a.id,b.id,data.reviews,sort));
+  const kmin=kcalMin===''?undefined:Number(kcalMin); const kmax=kcalMax===''?undefined:Number(kcalMax);
+  const inKcal=(r:(typeof results)[number]|(typeof ownResults)[number])=>{const k='servings' in r?r.macros.kcal:portionMacros(r,1).kcal;return (kmin===undefined||k>=kmin)&&(kmax===undefined||k<=kmax);};
+  const merged=[...ownResults,...results].filter(r=>reviewMatches(r.id,data.reviews,minimum,tested)&&inKcal(r)).sort((a,b)=>reviewSort(a.id,b.id,data.reviews,sort));
   return (
     <>
       <div className="mt-4 flex flex-wrap gap-2"><Button disabled={!ready} onClick={() => setCreating(true)}>+ Nowy przepis</Button><Button asChild variant="outline"><Link to="/dane">Kopia danych</Link></Button><Button asChild variant="outline"><Link to="/lodowka">Co mam w lodówce?</Link></Button><Button asChild variant="outline"><Link to="/generator">Ułóż tydzień</Link></Button></div>
@@ -83,6 +87,7 @@ export function RecipeBrowser({ favOnly = false }: { favOnly?: boolean }) {
         <label className="text-sm">Sprzęt<select className="mt-1 h-10 w-full rounded-md border bg-card px-3" value={equipment ?? ''} onChange={e=>setEquipment(e.target.value ? e.target.value as Equipment : undefined)}><option value="">Dowolny sprzęt</option>{Object.entries(equipmentLabels).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3"><label className="text-sm">Ocena od<select aria-label="Ocena od" value={minimum} onChange={e=>setMinimum(Number(e.target.value))} className="mt-1 h-10 w-full rounded-md border bg-card px-2"><option value="0">Dowolna</option>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n} ★</option>)}</select></label><label className="text-sm">Sortowanie<select aria-label="Sortowanie" value={sort} onChange={e=>setSort(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-2"><option value="default">Domyślne</option><option value="rating">Najwyższa ocena</option><option value="cooked">Ostatnio gotowane</option></select></label></div><label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={tested} onChange={e=>setTested(e.target.checked)}/>Sprawdzone (z datą gotowania)</label>
+      <div className="mt-3 grid grid-cols-2 gap-3"><label className="text-sm">kcal od<input aria-label="kcal od" type="number" inputMode="numeric" min={0} placeholder="np. 200" value={kcalMin} onChange={e=>setKcalMin(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-3"/></label><label className="text-sm">kcal do<input aria-label="kcal do" type="number" inputMode="numeric" min={0} placeholder="np. 600" value={kcalMax} onChange={e=>setKcalMax(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-3"/></label></div>
       <p className="mt-4 text-xs text-muted-foreground">{merged.length} przepisów</p>
       <div className="mt-2 space-y-3">
         {merged.map(r=>'servings' in r?<CustomRecipeCard key={r.id} recipe={r}/>:<MealCard key={r.id} recipe={r} label={typeLabel[r.type]}/>)}

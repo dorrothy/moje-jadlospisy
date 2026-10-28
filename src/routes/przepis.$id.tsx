@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
-import { ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
+import { ChefHat, ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
+import { CookingMode } from "@/components/CookingMode";
 import { OwnRecipePage } from "@/components/OwnRecipePage";
 import { RecipeEditor } from "@/components/RecipeEditor";
 import { Button } from "@/components/ui/button";
@@ -57,8 +58,11 @@ function OriginalRecipePage() {
   const { porcje = 1 } = Route.useSearch();
   const [servings, setServings] = useState(porcje);
   const [forHim, setForHim] = useState(false);
+  const [cooking, setCooking] = useState(false);
+  const [kcalTarget, setKcalTarget] = useState('');
   const [protein, setProtein] = useState(false);
   if (!recipe) return null;
+  const baseKcal = computeMacros(recipeItems(recipe,false,protein)).kcal;
   const m = computeMacros(recipeItems(recipe,false,protein).map(([id,g])=>[id,g*servings]));
   const partnerM = recipe.partner ? computeMacros(recipeItems(recipe, true, protein)) : null;
   const shown = forHim && partnerM ? partnerM : m;
@@ -139,6 +143,14 @@ function OriginalRecipePage() {
             <Button size="icon" variant="ghost" disabled={forHim} aria-label="Więcej porcji" onClick={() => setServings((s) => Math.min(20, s + .25))}><Plus className="h-4 w-4" /></Button>
           </div>
         </div>
+        {!forHim && (
+          <div className="mt-2 flex items-center gap-2">
+            <label className="flex-1 text-sm text-muted-foreground">Przelicz na kalorie
+              <input aria-label="Docelowa kaloryczność" type="number" inputMode="numeric" min={1} placeholder={`np. ${Math.max(50, Math.round(baseKcal / 2))}`} value={kcalTarget} onChange={(e) => setKcalTarget(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-3" />
+            </label>
+            <Button variant="outline" size="sm" className="mt-5" disabled={!kcalTarget || Number(kcalTarget) <= 0 || baseKcal === 0} onClick={() => setServings(Math.min(20, Math.max(.75, Math.round((Number(kcalTarget) / baseKcal) * 4) / 4)))}>Ustaw</Button>
+          </div>
+        )}
         <div className="mt-3 overflow-hidden rounded-2xl border bg-card">
           <table className="w-full text-sm">
             <thead className="bg-muted text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -169,7 +181,10 @@ function OriginalRecipePage() {
       </section>
 
       <section className="mt-6">
-        <h2 className="text-xl font-bold">Przygotowanie</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-xl font-bold">Przygotowanie</h2>
+          <Button variant="outline" size="sm" onClick={() => setCooking(true)}><ChefHat className="h-4 w-4" />Gotuję teraz</Button>
+        </div>
         <ol className="mt-3 space-y-3">
           {recipe.steps.map((s, i) => (
             <li key={i} className="flex gap-3 rounded-2xl bg-card p-4">
@@ -179,6 +194,7 @@ function OriginalRecipePage() {
           ))}
         </ol>
       </section>
+      {cooking && <CookingMode name={recipe.name} steps={recipe.steps} onClose={() => setCooking(false)} />}
     </main>
   );
 }
