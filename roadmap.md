@@ -48,3 +48,6 @@ Zdjęcia: 105 testów przeszło. Chromium 390×844: galeria, 3200×2400 → JPEG
 - [x] Estetyka: kolor i ikonka dla własnych tygodni (kafelki jak oryginalne, wybór w edytorze tygodnia)
 - [x] Więcej ikonek tygodni (28 do wyboru) i napis „← Powrót do menu"
 - [x] Nazwa aplikacji „Let's cook" i edytowalny nagłówek na stronie głównej
+- [x] Wyrównanie przycisków „Duplikuj jako własny" i „Ocena i notatka" w jednej linii
+- [x] Składniki widoczne w trybie „Gotuję teraz" (oryginalne i własne przepisy)
+- [ ] Tryb „gotuję dla 2" — łączona lista składników: Twoja porcja + porcja chłopaka naraz (przepis, zakupy, tryb gotowania)
