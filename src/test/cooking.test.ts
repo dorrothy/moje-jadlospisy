@@ -3,8 +3,9 @@ import { originalCookingItems, ownCookingItems } from '@/lib/cooking';
 import { recipeById } from '@/data/recipes';
 import type { CustomRecipe } from '@/lib/custom-data';
 
-const dorsz = recipeById['wypieki-dorsz-pomidorowy'];
-const tacos = recipeById['wypieki-fish-tacos'];
+const recipe = (id: string) => { const r = recipeById[id]; if (!r) throw new Error(`Brak przepisu ${id}`); return r; };
+const dorsz = recipe('wypieki-dorsz-pomidorowy');
+const tacos = recipe('wypieki-fish-tacos');
 
 describe('lista składników w trybie gotowania', () => {
   it('pokazuje wszystkie składniki i przelicza je z liczbą porcji', () => {
