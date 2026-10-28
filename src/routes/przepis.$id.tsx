@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { ChefHat, ChevronLeft, Clock, Heart, Minus, Plus, Users } from "lucide-react";
 import { CookingMode } from "@/components/CookingMode";
-import { originalCookingItems } from "@/lib/cooking";
+import { COOK_FOR_LABELS, originalCookingItems, type CookFor } from "@/lib/cooking";
 import { OwnRecipePage } from "@/components/OwnRecipePage";
 import { RecipeEditor } from "@/components/RecipeEditor";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { useState } from "react";
 import { recipeById, type Recipe } from "@/data/recipes";
 import { ingredients } from "@/data/ingredients";
 import { equipmentLabels, recipeEquipment } from '@/data/equipment';
-import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems, portionMacros } from "@/lib/meals";
+import { computeMacros, itemMacros, typeLabel, weeksOfRecipe, formatItemAmount, recipeItems, portionMacros, combinedItems, sumMacros } from "@/lib/meals";
 import { useFavorites } from "@/lib/storage";
 import { RecipeReview, ReviewSummary } from '@/components/RecipeReview';
 import { RecipePhotos } from '@/components/RecipePhotos';
@@ -58,7 +58,7 @@ function OriginalRecipePage() {
   const { isFav, toggle } = useFavorites();
   const { porcje = 1 } = Route.useSearch();
   const [servings, setServings] = useState(porcje);
-  const [forHim, setForHim] = useState(false);
+  const [mode, setMode] = useState<CookFor>('me');
   const [cooking, setCooking] = useState(false);
   const [kcalTarget, setKcalTarget] = useState('');
   const [protein, setProtein] = useState(false);
@@ -66,7 +66,9 @@ function OriginalRecipePage() {
   const baseKcal = computeMacros(recipeItems(recipe,false,protein)).kcal;
   const m = computeMacros(recipeItems(recipe,false,protein).map(([id,g])=>[id,g*servings]));
   const partnerM = recipe.partner ? computeMacros(recipeItems(recipe, true, protein)) : null;
-  const shown = forHim && partnerM ? partnerM : m;
+  const shown = mode === 'him' && partnerM ? partnerM : mode === 'both' && partnerM ? sumMacros([m, partnerM]) : m;
+  const tableItems = mode === 'both' ? combinedItems(recipe, protein, servings) : recipeItems(recipe, mode === 'him', protein);
+  const scale = mode === 'me' ? servings : 1;
   const fav = isFav(recipe.id);
 
   return (
@@ -108,7 +110,7 @@ function OriginalRecipePage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground">
-          Wartości szacunkowe: {forHim ? '1 większa porcja chłopaka' : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja bazowa'}`}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
+          Wartości szacunkowe: {mode === 'him' ? '1 większa porcja chłopaka' : mode === 'both' ? `Twoje ${servings.toLocaleString('pl')} × porcji plus 1 większa porcja chłopaka` : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja bazowa'}`}{protein ? " — wariant z kurczakiem" : ""}, wyliczone z tabeli składników. Wynik może różnić się zależnie od produktu.
         </p>
         {recipe.rawWeights && <p className="mt-2 text-xs text-muted-foreground">Masy przed obróbką: jajka bez skorupki, owoce i warzywa bez niejadalnych części, konserwy odsączone. Ryż i makaron ważone na sucho. Drobne przyprawy bez gramatur nie są wliczone.</p>}
         {shown.missing.length > 0 && (
@@ -123,31 +125,32 @@ function OriginalRecipePage() {
 
       {recipe.proteinVariant && <label className="mt-4 flex items-start gap-3 rounded-lg border bg-card p-4 text-sm"><input type="checkbox" checked={protein} onChange={e=>setProtein(e.target.checked)} className="mt-1"/><span><strong className="block">Wariant wysokobiałkowy: kurczak 120 g</strong>{recipe.proteinVariant.note}<span className="mt-2 block text-muted-foreground">Aby zaplanować ten wariant i uwzględnić go w zakupach, wybierz „Duplikuj jako własny” po zaznaczeniu opcji.</span></span></label>}
       {recipe.partner && (
-        <Button variant="ghost" aria-pressed={forHim}
-          onClick={() => setForHim((v) => !v)}
-          className={`mt-4 flex h-auto w-full items-center gap-3 whitespace-normal rounded-2xl border p-4 text-left transition-colors ${forHim ? "border-primary bg-secondary" : "bg-card"}`}
-        >
-          <Users className="h-5 w-5 shrink-0 text-primary" />
-          <span className="flex-1 text-sm">
-            <strong className="block">Wersja dla chłopaka</strong>
-            <span className="text-muted-foreground">{recipe.partner.note}</span>
-          </span>
-          <span className={`h-6 w-10 rounded-full p-0.5 transition-colors ${forHim ? "bg-primary" : "bg-muted"}`}>
-            <span className={`block h-5 w-5 rounded-full bg-card transition-transform ${forHim ? "translate-x-4" : ""}`} />
-          </span>
-        </Button>
+        <div className="mt-4 rounded-2xl border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5 shrink-0 text-primary" />
+            <strong className="text-sm">Dla kogo gotujesz?</strong>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Dla kogo gotujesz">
+            {(['me', 'him', 'both'] as CookFor[]).map((v) => (
+              <Button key={v} size="sm" variant={mode === v ? 'default' : 'outline'} aria-pressed={mode === v} onClick={() => setMode(v)}>{COOK_FOR_LABELS[v]}</Button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {mode === 'both' ? 'Gotujesz podwójnie: Twoje gramatury i jego większa porcja razem, w jednej liście składników.' : recipe.partner.note}
+          </p>
+        </div>
       )}
 
       <section className="mt-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Składniki</h2>
           <div className="flex items-center gap-2 rounded-full bg-card p-1 shadow-soft">
-            <Button size="icon" variant="ghost" disabled={forHim} aria-label="Mniej porcji" onClick={() => setServings((s) => Math.max(.75, s - .25))}><Minus className="h-4 w-4" /></Button>
-            <span className="min-w-16 text-center text-sm font-medium">{forHim ? '1 większa porcja' : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja'}`}</span>
-            <Button size="icon" variant="ghost" disabled={forHim} aria-label="Więcej porcji" onClick={() => setServings((s) => Math.min(20, s + .25))}><Plus className="h-4 w-4" /></Button>
+            <Button size="icon" variant="ghost" disabled={mode === 'him'} aria-label="Mniej porcji" onClick={() => setServings((s) => Math.max(.75, s - .25))}><Minus className="h-4 w-4" /></Button>
+            <span className="min-w-16 text-center text-sm font-medium">{mode === 'him' ? '1 większa porcja' : mode === 'both' ? `Twoje ${servings.toLocaleString('pl')} × + jego` : `${servings.toLocaleString('pl')} × ${recipe.yield ? recipe.yield.unit : 'porcja'}`}</span>
+            <Button size="icon" variant="ghost" disabled={mode === 'him'} aria-label="Więcej porcji" onClick={() => setServings((s) => Math.min(20, s + .25))}><Plus className="h-4 w-4" /></Button>
           </div>
         </div>
-        {!forHim && (
+        {mode !== 'him' && (
           <div className="mt-2 flex items-center gap-2">
             <label className="flex-1 text-sm text-muted-foreground">Przelicz na kalorie
               <input aria-label="Docelowa kaloryczność" type="number" inputMode="numeric" min={1} placeholder={`np. ${Math.max(50, Math.round(baseKcal / 2))}`} value={kcalTarget} onChange={(e) => setKcalTarget(e.target.value)} className="mt-1 h-10 w-full rounded-md border bg-card px-3" />
@@ -161,8 +164,8 @@ function OriginalRecipePage() {
               <tr><th className="px-3 py-2 text-left font-medium">Składnik</th><th className="px-2 py-2 text-right font-medium">Ilość</th><th className="px-3 py-2 text-right font-medium">kcal / B</th></tr>
             </thead>
             <tbody>
-              {recipeItems(recipe, forHim, protein).map((it, i) => {
-                const amount = it[1] * (forHim ? 1 : servings);
+              {tableItems.map((it, i) => {
+                const amount = it[1] * scale;
                 const im = itemMacros([it[0], amount]);
                 return (
                   <tr key={i} className="border-t">
@@ -202,7 +205,7 @@ function OriginalRecipePage() {
         <CookingMode
           name={recipe.name}
           steps={recipe.steps}
-          ingredients={originalCookingItems(recipe, forHim, protein, servings)}
+          ingredients={originalCookingItems(recipe, mode, protein, servings)}
           note={recipe.spices ? `Przyprawy: ${recipe.spices}` : undefined}
           onClose={() => setCooking(false)}
         />
