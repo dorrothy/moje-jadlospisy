@@ -35,6 +35,19 @@ export function recipeItems(recipe: Recipe, forHim = false, protein = false): It
   return protein && recipe.proteinVariant ? [...base, ...recipe.proteinVariant.extra] : base;
 }
 
+/** Razem dla 2 osób: Twoja porcja (× `servings`) i jego większa porcja, zsumowane po składnikach. */
+export function combinedItems(recipe: Recipe, protein = false, servings = 1): Item[] {
+  const row = (id: IngredientId, g: number, note?: string): Item => (note === undefined ? [id, g] : [id, g, note]);
+  const map = new Map<IngredientId, Item>();
+  for (const [id, g, note] of recipeItems(recipe, false, protein)) map.set(id, row(id, g * servings, note));
+  if (recipe.partner) for (const [id, g, note] of recipeItems(recipe, true, protein)) {
+    const prev = map.get(id);
+    if (prev) prev[1] += g;
+    else map.set(id, row(id, g, note));
+  }
+  return [...map.values()];
+}
+
 export function portionItems(recipe: Recipe, portion = 1): Item[] {
   return recipe.ingredients.map(([id, amount]) => [id, amount * portion]);
 }
